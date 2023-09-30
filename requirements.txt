@@ -5,3 +5,4 @@ flake8-docstrings==1.7.0
 pep8-naming==0.13.3
 pandas==2.1.1
 numpy==1.26.0
+xgboost==2.0.0
