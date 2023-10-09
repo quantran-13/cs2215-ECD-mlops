@@ -7,7 +7,8 @@ from clearml import Dataset
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(CURRENT_DIR))
 
-from root import DATA_DIR
+from root import DATA_DIR, RAW_DIR
+from configs.configs import PROJECT_NAME, DATASET_NAME
 
 
 def convert_txt_to_csv(input_file_path, output_file_path):
@@ -20,17 +21,14 @@ def convert_txt_to_csv(input_file_path, output_file_path):
 
 if __name__ == "__main__":
     # Example usage:
-    input_file_path = DATA_DIR / "raw" / "data_for_project.txt"
-    output_file_path = DATA_DIR / "raw" / "raw.csv"
+    input_file_path = DATA_DIR / "backup" / "data_for_project.txt"
+    output_file_path = RAW_DIR / "raw.csv"
     convert_txt_to_csv(input_file_path, output_file_path)
 
     # Create a new Dataset
-    dataset_name = "enegy_consumption"
-    dataset_project = "cs2215-project"
-
     ds = Dataset.create(
-        dataset_name=dataset_name,
-        dataset_project=dataset_project,
+        dataset_name=DATASET_NAME,
+        dataset_project=PROJECT_NAME,
         dataset_tags=["raw"],
     )
 
