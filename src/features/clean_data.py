@@ -1,20 +1,20 @@
 import pandas as pd
 import sys
 
-from clearml import Task, Dataset
+from clearml import Task, Dataset, TaskTypes
 from pathlib import Path
 
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
-from root import DATA_DIR
+from root import RAW_DIR, PROCESSED_DIR
 from configs.configs import PROJECT_NAME, DATASET_NAME
 
 
 def clean_data_func(
     raw_data_path: Path, output_file_path: Path
 ) -> pd.DataFrame:
-    df = pd.read_csv(raw_data_path, sep=";")
+    df = pd.read_csv(raw_data_path)
 
     df = df.drop_duplicates()
 
@@ -23,6 +23,7 @@ def clean_data_func(
 
     df["HourUTC"] = pd.to_datetime(df["HourUTC"])
     df.reset_index(drop=True, inplace=True)
+
     df.to_csv(output_file_path, index=False)
 
     return df
@@ -30,13 +31,10 @@ def clean_data_func(
 
 def main(dataset_id: str):
     ds = Dataset.get(dataset_id=dataset_id, alias=DATASET_NAME)
-    raw_data_path = DATA_DIR / "raw"
-    ds.get_mutable_local_copy(target_folder=raw_data_path, overwrite=True)
+    ds.get_mutable_local_copy(target_folder=RAW_DIR, overwrite=True)
 
-    processed_data_path = DATA_DIR / "processed"
-    data_cleaned = clean_data_func(
-        raw_data_path / "raw.csv", processed_data_path / "cleaned.csv"
-    )
+    processed_data_path = PROCESSED_DIR / "cleaned.csv"
+    data_cleaned = clean_data_func(RAW_DIR / "raw.csv", processed_data_path)
 
     clean_ds = Dataset.create(
         dataset_name=DATASET_NAME,
@@ -44,7 +42,7 @@ def main(dataset_id: str):
         parent_datasets=[dataset_id],
         dataset_tags=["cleaned"],
     )
-    clean_ds.add_files(path=data_cleaned, verbose=True)
+    clean_ds.add_files(path=processed_data_path, verbose=True)
     clean_ds.upload(verbose=True)
 
     return clean_ds
@@ -53,13 +51,13 @@ def main(dataset_id: str):
 task = Task.init(
     project_name=PROJECT_NAME,
     task_name="Cleaning data",
-    task_type=None,
+    task_type=TaskTypes.data_processing,
     tags="data-pipeline",
 )
 
 task.execute_remotely()
 
-parameters = {"dataset_id": "TO_BE_OVERWRITTEN"}
+parameters = {"dataset_id": ""}
 task.connect(parameters)
 
 clean_ds = main(dataset_id=parameters["dataset_id"])
