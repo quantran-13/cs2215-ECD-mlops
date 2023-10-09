@@ -14,17 +14,15 @@ def get_cleaned_dataset(dataset_task_id: str, dataset_id: str) -> pd.DataFrame:
         print(
             f"Input task id={dataset_task_id} artifacts {list(dataset_cleaned_task.artifacts.keys())}".format()  # noqa
         )
-        data_path = dataset_cleaned_task.artifacts[
-            "cleaned_data"
-        ].get_local_copy()
+        df = dataset_cleaned_task.artifacts["cleaned_data"].get()
     elif dataset_id:
         ds = Dataset.get(dataset_id=dataset_id, alias=DATASET_NAME)
         # ds.get_mutable_local_copy(target_folder=PROCESSED_DIR, overwrite=True)
         data_path = ds.get_local_copy()
+        df = pd.read_csv(data_path)
     else:
         raise ValueError("Missing dataset link")
 
-    df = pd.read_csv(data_path)
     return df
 
 

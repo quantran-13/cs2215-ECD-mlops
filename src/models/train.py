@@ -9,6 +9,7 @@ CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
 from configs.configs import PROJECT_NAME
+from root import MODEL_DIR
 from src.data.utils import get_training_dataset
 
 if __name__ == "__main__":
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     )
 
     args = {
-        "dataset_task_id": "",
+        "dataset_task_id": "8c7a29cb12704b5ca9dcb674d3d218fb",
         "n_estimators": 100,
         "random_state": 42,
         "enable_categorical": True,
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     task.connect(args)
     print(f"Arguments: {args}")
 
-    task.execute_remotely()
+    # task.execute_remotely()
 
     X_train, X_test, y_train, y_test = get_training_dataset(
         dataset_task_id=args["dataset_task_id"]
@@ -43,5 +44,5 @@ if __name__ == "__main__":
     )
     model.fit(X_train, y_train)
 
-    joblib.dump(model, "model.pkl", compress=True)
-    task.upload_artifact("model.pkl", artifact_name="model")
+    joblib.dump(model, MODEL_DIR / "model.pkl", compress=True)
+    task.upload_artifact("model", MODEL_DIR / "model.pkl")

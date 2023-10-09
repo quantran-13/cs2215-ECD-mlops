@@ -32,6 +32,10 @@ pipe.add_parameter(
     "f1ea4fc197364f939c593ba5e0353c0d",
 )
 pipe.add_parameter(
+    "dataset_id",
+    "ab5cd06b064f40afae555d9033de8c29",
+)
+pipe.add_parameter(
     "lag_time",
     1,
 )
@@ -65,9 +69,10 @@ pipe.add_parameter(
 )
 pipe.add_step(
     name="preprocess_data",
-    base_task_id="b832e235f7534c6fb19447e2e295c13c",
+    base_task_id="2607fbe58df148068679f9ed889203fb",
     parameter_override={
         "General/dataset_task_id": "${pipeline.dataset_task_id}",
+        "General/dataset_id": "${pipeline.dataset_id}",
         "General/lag_time": "${pipeline.lag_time}",
         "General/warn_on_na": "${pipeline.warn_on_na}",
         "General/drop_na": "${pipeline.drop_na}",
@@ -79,7 +84,7 @@ pipe.add_step(
 )
 pipe.add_step(
     name="training_model",
-    base_task_id="4b6f79164389448381d21d7e9cea4218",
+    base_task_id="8c800f4a71fa41319bdea741da3d80f8",
     parents=["preprocess_data"],
     parameter_override={
         "General/dataset_task_id": "${preprocess_data.id}",
@@ -92,7 +97,7 @@ pipe.add_step(
 )
 pipe.add_step(
     name="evaluate_model",
-    base_task_id="7df36f89030e46f9884d2313debcedaf",
+    base_task_id="d19ce0f17abe4810885033f0f8e64755",
     parents=["training_model"],
     parameter_override={
         "General/dataset_task_id": "${preprocess_data.id}",
