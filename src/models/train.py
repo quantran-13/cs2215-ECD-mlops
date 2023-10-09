@@ -1,10 +1,9 @@
-import joblib
 import sys
-
-from clearml import Task, TaskTypes
 from pathlib import Path
-from xgboost import XGBRegressor
 
+import joblib
+from clearml import Task, TaskTypes
+from xgboost import XGBRegressor
 
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(CURRENT_DIR))

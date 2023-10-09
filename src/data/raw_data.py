@@ -7,8 +7,8 @@ from clearml import Dataset
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(CURRENT_DIR))
 
+from configs.configs import DATASET_NAME, PROJECT_NAME
 from root import DATA_DIR, RAW_DIR
-from configs.configs import PROJECT_NAME, DATASET_NAME
 
 
 def convert_txt_to_csv(input_file_path, output_file_path):

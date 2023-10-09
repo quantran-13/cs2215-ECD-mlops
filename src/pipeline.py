@@ -1,5 +1,7 @@
-from clearml import Task
 from clearml.automation import PipelineController
+
+from configs.configs import DATASET_ID, DATASET_NAME, PROJECT_NAME
+from root import DATA_DIR
 
 
 def pre_execute_callback_example(a_pipeline, a_node, current_param_override):
@@ -21,55 +23,45 @@ def post_execute_callback_example(a_pipeline, a_node):
     return
 
 
-# Connecting ClearML with the current pipeline,
-# from here on everything is logged automatically
 pipe = PipelineController(
-    name="Pipeline demo",
-    project="examples",
-    version="0.0.1",
-    add_pipeline_tags=False,
+    name="ETL", project=PROJECT_NAME, version="0.0.1", add_pipeline_tags=False
 )
-
-pipe.add_parameter(
-    "url",
-    "https://files.community.clear.ml/examples%252F.pipelines%252FPipeline%20demo/stage_data.8f17b6316ce442ce8904f6fccb1763de/artifacts/dataset/f6d08388e9bc44c86cab497ad31403c4.iris_dataset.pkl",
-    "dataset_url",
-)
-
 pipe.set_default_execution_queue("default")
 
-pipe.add_step(
-    name="stage_data",
-    base_task_project="examples",
-    base_task_name="Pipeline step 1 dataset artifact",
-    parameter_override={"General/dataset_url": "${pipeline.url}"},
+pipe.add_parameter(
+    name="dataset_id",
+    default=DATASET_ID,
 )
-
 pipe.add_step(
-    name="stage_process",
-    parents=["stage_data"],
-    base_task_project="examples",
-    base_task_name="Pipeline step 2 process dataset",
-    parameter_override={
-        "General/dataset_url": "${stage_data.artifacts.dataset.url}",
-        "General/test_size": 0.25,
-    },
-    pre_execute_callback=pre_execute_callback_example,
-    post_execute_callback=post_execute_callback_example,
+    name="clean_data",
+    base_task_id="b36d38aaeb6c481a975899a5df28adbb",
+    parameter_override={"General/dataset_id": "${pipeline.dataset_id}"},
 )
+# pipe.add_step(
+#     name="stage_process",
+#     base_task_project="Pipeline from Tasks example",
+#     base_task_name="Pipeline step 2 process dataset",
+#     parents=["stage_data"],
+#     parameter_override={
+#         "General/dataset_url": "${stage_data.artifacts.dataset.url}",
+#         "General/test_size": 0.25,
+#     },
+# pre_execute_callback=pre_execute_callback_example,
+# post_execute_callback=post_execute_callback_example,
+# )
+# pipe.add_step(
+#     name="stage_train",
+#     base_task_project="Pipeline from Tasks example",
+#     base_task_name="Pipeline step 3 train model",
+#     parents=["stage_process"],
+#     parameter_override={"General/  ": "${stage_process.id}"},
+# )
 
-pipe.add_step(
-    name="stage_train",
-    parents=["stage_process"],
-    base_task_project="examples",
-    base_task_name="Pipeline step 3 train model",
-    parameter_override={"General/dataset_task_id": "${stage_process.id}"},
-)
 
-# for debugging purposes use local jobs
+# For debugging purposes use local jobs
 pipe.start_locally()
 
 # Starting the pipeline (in the background)
 # pipe.start()
 
-print("done")
+print("Done")

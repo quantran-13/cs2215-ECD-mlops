@@ -1,7 +1,6 @@
-from configs.configs import PROJECT_NAME
-
-
 from clearml.automation import PipelineController
+
+from configs.configs import PROJECT_NAME
 
 
 def pre_execute_callback_example(a_pipeline, a_node, current_param_override):
@@ -30,7 +29,7 @@ pipe.set_default_execution_queue("default")
 
 pipe.add_parameter(
     "dataset_task_id",
-    "8c45d56eaa294c7ca120b4bfafc462d9",
+    "f1ea4fc197364f939c593ba5e0353c0d",
 )
 pipe.add_parameter(
     "lag_time",
@@ -66,7 +65,7 @@ pipe.add_parameter(
 )
 pipe.add_step(
     name="preprocess_data",
-    base_task_id="405b6fa84b21451992aa82acac455094",
+    base_task_id="b832e235f7534c6fb19447e2e295c13c",
     parameter_override={
         "General/dataset_task_id": "${pipeline.dataset_task_id}",
         "General/lag_time": "${pipeline.lag_time}",
@@ -80,7 +79,7 @@ pipe.add_step(
 )
 pipe.add_step(
     name="training_model",
-    base_task_id="979ef0f1905f4253af3cb21844654cbf",
+    base_task_id="4b6f79164389448381d21d7e9cea4218",
     parents=["preprocess_data"],
     parameter_override={
         "General/dataset_task_id": "${preprocess_data.id}",
@@ -93,7 +92,7 @@ pipe.add_step(
 )
 pipe.add_step(
     name="evaluate_model",
-    base_task_id="659b28ddd2ca4a868d0e68986b5c6bb0",
+    base_task_id="7df36f89030e46f9884d2313debcedaf",
     parents=["training_model"],
     parameter_override={
         "General/dataset_task_id": "${preprocess_data.id}",

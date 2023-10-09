@@ -1,14 +1,14 @@
-import pandas as pd
 import sys
-
-from clearml import Task, Dataset, TaskTypes
 from pathlib import Path
+
+import pandas as pd
+from clearml import Dataset, Task, TaskTypes
 
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
-from root import RAW_DIR, PROCESSED_DIR
-from configs.configs import PROJECT_NAME, DATASET_NAME
+from configs.configs import DATASET_NAME, PROJECT_NAME
+from root import PROCESSED_DIR, RAW_DIR
 
 
 def clean_data_func(
@@ -44,28 +44,25 @@ def main(dataset_id: str):
     )
     clean_ds.add_files(path=processed_data_path, verbose=True)
     clean_ds.upload(verbose=True)
+    clean_ds.finalize()
 
-    return clean_ds
+    return data_cleaned
 
 
-task = Task.init(
-    project_name=PROJECT_NAME,
-    task_name="Cleaning data",
-    task_type=TaskTypes.data_processing,
-    tags="data-pipeline",
-)
+if __name__ == "__main__":
+    task = Task.init(
+        project_name=PROJECT_NAME,
+        task_name="Cleaning data",
+        task_type=TaskTypes.data_processing,
+        tags="data-pipeline",
+    )
+    args = {"dataset_id": "3600ab42b68b44a983d50a3397d2faae"}
+    task.connect(args)
 
-task.execute_remotely()
+    # task.execute_remotely()
 
-parameters = {"dataset_id": ""}
-task.connect(parameters)
+    data_cleaned = main(dataset_id=args["dataset_id"])
+    task.upload_artifact("cleaned_data", data_cleaned)
+    print("Uploading artifacts in the background")
 
-clean_ds = main(dataset_id=parameters["dataset_id"])
-
-task.upload_artifact("cleaned_data", clean_ds.id)
-
-print("Uploading artifacts in the background")
-clean_ds.finalize()
-
-# task.close()
-print("Done!")
+    print("Done!")

@@ -1,15 +1,16 @@
 import sys
+from pathlib import Path
 
 from clearml import Task, TaskTypes
-from pathlib import Path
 
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 import xgboost as xgb
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
 from configs.configs import PROJECT_NAME
 from src.data.utils import get_training_dataset
 from src.models.utils import get_model
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 if __name__ == "__main__":
     task = Task.init(

@@ -1,6 +1,6 @@
 import pandas as pd
+from clearml import Dataset, Task
 
-from clearml import Task, Dataset
 from configs.configs import DATASET_NAME
 
 

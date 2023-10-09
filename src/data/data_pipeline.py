@@ -1,20 +1,20 @@
-import pandas as pd
 import sys
 import time
-
-from clearml import Task, TaskTypes
 from pathlib import Path
+
+import pandas as pd
+from clearml import Task, TaskTypes
 
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
-from configs.configs import PROJECT_NAME
-
-from src.data.time_series_processor import TimeSeriesProcessor
-from src.data.lag_feature_generator import LagFeatureGenerator
-from sklearn.pipeline import Pipeline
-from src.data.utils import get_cleaned_dataset
 from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+
+from configs.configs import PROJECT_NAME
+from src.data.lag_feature_generator import LagFeatureGenerator
+from src.data.time_series_processor import TimeSeriesProcessor
+from src.data.utils import get_cleaned_dataset
 
 
 def prepare_training_data(df, test_size: float, random_state: int):

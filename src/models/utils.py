@@ -1,5 +1,5 @@
-from clearml import Task
 import joblib
+from clearml import Task
 
 
 def get_model(model_task_id: str):
