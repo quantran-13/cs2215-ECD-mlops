@@ -1,5 +1,6 @@
 import sys
 import time
+import datetime as dt
 from pathlib import Path
 
 from clearml import Task, TaskTypes
@@ -24,7 +25,7 @@ if __name__ == "__main__":
 
     args = {
         "file_path": BACKUP_DIR / "data_for_project.txt",
-        "export_end_reference_datetime": None,
+        "export_end_reference_datetime": "",
         "days_delay": 15,
         "days_export": 90,
     }
@@ -37,6 +38,10 @@ if __name__ == "__main__":
 
     file_path = args["file_path"]
     export_end_reference_datetime = args["export_end_reference_datetime"]
+    if export_end_reference_datetime == "":
+        export_end_reference_datetime = None
+    else:
+        export_end_reference_datetime = dt.datetime.strptime(export_end_reference_datetime, "%Y-%m-%d %H:%M")
     days_delay = args["days_delay"]
     days_export = args["days_export"]
 
