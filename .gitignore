@@ -592,3 +592,5 @@ models/*
 reports/*
 !*.keep
 tmp/*
+notebooks_dev/*
+output/*
