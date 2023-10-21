@@ -1,9 +1,11 @@
 import pandas as pd
 from clearml import Dataset
-
 from configs.configs import DATASET_NAME, PROJECT_NAME
 from root import PROCESSED_DIR
+from src.utils.logger import get_logger
 from src.utils.task_utils import save_json
+
+logger = get_logger("logs", __name__)
 
 
 def to_feature_store(data: pd.DataFrame, metadata: dict, parent_datasets: list[str] | None = None):

@@ -1,4 +1,7 @@
 import pandas as pd
+from src.utils.logger import get_logger
+
+logger = get_logger("logs", __name__)
 
 
 def transform(data: pd.DataFrame) -> pd.DataFrame:

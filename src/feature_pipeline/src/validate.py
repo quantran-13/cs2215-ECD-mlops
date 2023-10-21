@@ -1,6 +1,9 @@
 import pandas as pd
 from great_expectations.core import ExpectationConfiguration, ExpectationSuite
 from great_expectations.dataset import PandasDataset
+from src.utils.logger import get_logger
+
+logger = get_logger("logs", __name__)
 
 
 def build_expectation_suite(df: pd.DataFrame) -> ExpectationSuite:
@@ -12,14 +15,7 @@ def build_expectation_suite(df: pd.DataFrame) -> ExpectationSuite:
     expectation_suite_ec.add_expectation(
         ExpectationConfiguration(
             expectation_type="expect_table_columns_to_match_ordered_list",
-            kwargs={
-                "column_list": [
-                    "datetime_utc",
-                    "area",
-                    "consumer_type",
-                    "energy_consumption",
-                ]
-            },
+            kwargs={"column_list": ["datetime_utc", "area", "consumer_type", "energy_consumption"]},
         )
     )
     expectation_suite_ec.add_expectation(
@@ -29,8 +25,7 @@ def build_expectation_suite(df: pd.DataFrame) -> ExpectationSuite:
     # Datetime UTC
     expectation_suite_ec.add_expectation(
         ExpectationConfiguration(
-            expectation_type="expect_column_values_to_not_be_null",
-            kwargs={"column": "datetime_utc"},
+            expectation_type="expect_column_values_to_not_be_null", kwargs={"column": "datetime_utc"}
         )
     )
 
@@ -43,8 +38,7 @@ def build_expectation_suite(df: pd.DataFrame) -> ExpectationSuite:
     )
     expectation_suite_ec.add_expectation(
         ExpectationConfiguration(
-            expectation_type="expect_column_values_to_be_of_type",
-            kwargs={"column": "area", "type_": "int8"},
+            expectation_type="expect_column_values_to_be_of_type", kwargs={"column": "area", "type_": "int8"}
         )
     )
 
@@ -99,8 +93,7 @@ def build_expectation_suite(df: pd.DataFrame) -> ExpectationSuite:
     )
     expectation_suite_ec.add_expectation(
         ExpectationConfiguration(
-            expectation_type="expect_column_values_to_be_of_type",
-            kwargs={"column": "consumer_type", "type_": "int32"},
+            expectation_type="expect_column_values_to_be_of_type", kwargs={"column": "consumer_type", "type_": "int32"}
         )
     )
 
@@ -108,11 +101,7 @@ def build_expectation_suite(df: pd.DataFrame) -> ExpectationSuite:
     expectation_suite_ec.add_expectation(
         ExpectationConfiguration(
             expectation_type="expect_column_min_to_be_between",
-            kwargs={
-                "column": "energy_consumption",
-                "min_value": 0,
-                "strict_min": False,
-            },
+            kwargs={"column": "energy_consumption", "min_value": 0, "strict_min": False},
         )
     )
     expectation_suite_ec.add_expectation(

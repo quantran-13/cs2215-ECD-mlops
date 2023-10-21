@@ -8,11 +8,11 @@ CURRENT_DIR = Path(__file__).parent.parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
 from configs.configs import PROJECT_NAME
-from src.feature_pipeline.etl import transform
+from src.feature_pipeline.src import transform
 from src.utils.logger import get_logger
 from src.utils.task_utils import get_task_artifacts
 
-logger = get_logger(__name__)
+logger = get_logger("logs", __name__)
 
 
 if __name__ == "__main__":
@@ -24,12 +24,13 @@ if __name__ == "__main__":
     )
 
     args = {
-        "artifacts_task_id": "OVERWRITE_ME",
+        # "artifacts_task_id": "OVERWRITE_ME",
+        "artifacts_task_id": "bc68eb8605724437b300170417385b0a",
     }
     task.connect(args)
     print(f"Arguments: {args}")
 
-    task.execute_remotely()
+    # task.execute_remotely()
 
     logger.info("Transforming data.")
 

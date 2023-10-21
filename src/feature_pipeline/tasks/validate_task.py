@@ -8,11 +8,11 @@ CURRENT_DIR = Path(__file__).parent.parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
 from configs.configs import PROJECT_NAME
-from src.feature_pipeline.etl import validate
+from src.feature_pipeline.src import validate
 from src.utils.logger import get_logger
 from src.utils.task_utils import get_task_artifacts
 
-logger = get_logger(__name__)
+logger = get_logger("logs", __name__)
 
 if __name__ == "__main__":
     task = Task.init(
@@ -23,12 +23,13 @@ if __name__ == "__main__":
     )
 
     args = {
-        "artifacts_task_id": "OVERWRITE_ME",
+        # "artifacts_task_id": "OVERWRITE_ME",
+        "artifacts_task_id": "09a03899dcc541268b6371a69e6da269",
     }
     task.connect(args)
     print(f"Arguments: {args}")
 
-    task.execute_remotely()
+    # task.execute_remotely()
 
     logger.info("Validating data.")
 
