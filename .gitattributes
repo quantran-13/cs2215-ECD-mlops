@@ -1,0 +1,1 @@
+data/backup/data_for_project.txt filter=lfs diff=lfs merge=lfs -text
