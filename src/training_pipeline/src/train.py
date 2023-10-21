@@ -1,32 +1,28 @@
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import os
+import time
 from collections import OrderedDict
-from typing import Optional
-from typing import OrderedDict as OrderedDictType
+from typing import OrderedDict as OrderedDictType  # noqa
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sktime.performance_metrics.forecasting import (
-    mean_absolute_percentage_error,
-    mean_squared_percentage_error,
-)
+from root import MODEL_DIR, OUTPUT_DIR
+from sktime.performance_metrics.forecasting import mean_absolute_percentage_error, mean_squared_percentage_error
 from sktime.utils.plotting import plot_series
-from src.training_pipeline.src.models import build_baseline_model, build_model
-from root import OUTPUT_DIR
 from src.training_pipeline.src.data import load_dataset
-from src.utils.task_utils import get_task_artifacts
-
+from src.training_pipeline.src.models import build_baseline_model, build_model
 from src.utils.logger import get_logger
+from src.utils.task_utils import get_task_artifacts, save_model
 
 logger = get_logger("logs", __name__)
 
 
-data_task_id = "a1cef1cc2ccb491e8e2601b4bd71195f"
-hpo_task_id = "28e6cad475cd43bd9f1da6851fdd2024"
-fh = 24
-
-
-def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24) -> dict:
+def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24):
     """Train and evaluate on the test set the best model found in the hyperparameter optimization run.
     # After training and evaluating it uploads the artifacts to wandb & hopsworks model registries.
 
@@ -44,20 +40,28 @@ def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24
     task_logger = task.get_logger()
 
     # Load data.
+    logger.info("Loading data from feature store...")
+    t1 = time.time()
     (y_train, y_test, X_train, X_test), metadata = load_dataset(task_id=data_task_id, fh=fh)
     task.register_artifact("y_train", y_train)
     task.register_artifact("y_test", y_test)
     task.register_artifact("X_train", X_train)
     task.register_artifact("X_test", X_test)
+    logger.info("Successfully loaded data from feature store in %.2f seconds.", time.time() - t1)
 
     # Load best model configuration.
+    logger.info("Loading best model configuration...")
+    t1 = time.time()
     task_artifacts = get_task_artifacts(task_id=hpo_task_id)
     best_config_artifact = task_artifacts["best_params"].get()
     best_config_artifact.update(task_artifacts["model_cfg"].get())
 
     task.upload_artifact("model_cfg", best_config_artifact)
+    logger.info("Successfully loaded best model configuration in %.2f seconds.", time.time() - t1)
 
     # Baseline model
+    logger.info("Building & training baseline model...")
+    t1 = time.time()
     baseline_forecaster = build_baseline_model(seasonal_periodicity=fh)
     baseline_forecaster = train_model(baseline_forecaster, y_train, X_train, fh=fh)
     _, metrics_baseline = evaluate(baseline_forecaster, y_test, X_test)
@@ -67,8 +71,11 @@ def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24
     task_logger.report_scalar("Test MAPE", "Baseline", metrics_baseline["MAPE"], iteration=0)
     task_logger.report_scalar("Test RMSPE", "Baseline", metrics_baseline["RMSPE"], iteration=0)
     task_logger.report_table(title="Slices results", series="Baseline results", iteration=0, table_plot=slices)
+    logger.info("Successfully built & trained baseline model in %.2f seconds.", time.time() - t1)
 
     # Build & train best model
+    logger.info("Building & training best model...")
+    t1 = time.time()
     best_model = build_model(best_config_artifact)
     best_forecaster = train_model(best_model, y_train, X_train, fh=fh)
     y_pred, metrics = evaluate(best_forecaster, y_test, X_test)
@@ -78,14 +85,20 @@ def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24
     task_logger.report_scalar("Test MAPE", "Best model", metrics["MAPE"], iteration=0)
     task_logger.report_scalar("Test RMSPE", "Best model", metrics["RMSPE"], iteration=0)
     task_logger.report_table(title="Slices results", series="Best model results", iteration=0, table_plot=slices)
+    logger.info("Successfully built & trained best model in %.2f seconds.", time.time() - t1)
 
     # Render best model on the test set.
+    logger.info("Rendering best model on the test set...")
+    t1 = time.time()
     results = OrderedDict({"y_train": y_train, "y_test": y_test, "y_pred": y_pred})
     render(results, task_logger, prefix="images_test")
+    logger.info("Successfully rendered best model on the test set in %.2f seconds.", time.time() - t1)
 
     # Update best model with the test set.
     # NOTE: Method update() is not supported by LightGBM + Sktime. Instead we will retrain the model on the entire dataset.
     # best_forecaster = best_forecaster.update(y_test, X=X_test)
+    logger.info("Retraining best model on the entire dataset and forecasting...")
+    t1 = time.time()
     best_forecaster = train_model(
         model=best_forecaster,
         y_train=pd.concat([y_train, y_test]).sort_index(),
@@ -99,8 +112,13 @@ def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24
         y_forecast.index.get_level_values("datetime_utc").min().to_timestamp().isoformat(),
         y_forecast.index.get_level_values("datetime_utc").max().to_timestamp().isoformat(),
     )
+    logger.info(
+        "Successfully retrained best model on the entire dataset and forecasted in %.2f seconds.", time.time() - t1
+    )
 
     # Render best model future forecasts.
+    logger.info("Rendering best model future forecasts...")
+    t1 = time.time()
     results = OrderedDict(
         {
             "y_train": y_train,
@@ -109,15 +127,17 @@ def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24
         }
     )
     render(results, task_logger, prefix="images_forecast")
+    logger.info("Successfully rendered best model future forecasts in %.2f seconds.", time.time() - t1)
 
-    return_dict = {
-        "model": best_forecaster,
-        "metadata": metadata,
-    }
-
+    # Save best model.
+    logger.info("Saving best model...")
+    t1 = time.time()
     # metadata = {"model_version": model_version}
-
-    return return_dict
+    save_model(best_forecaster, MODEL_DIR / "model.pkl")
+    task.upload_artifact("model", MODEL_DIR / "model.pkl")
+    task.upload_artifact("best_forecaster", best_forecaster)
+    task.upload_artifact("metadata", metadata)
+    logger.info("Successfully saved best model in %.2f seconds.", time.time() - t1)
 
 
 def train_model(model, y_train: pd.DataFrame, X_train: pd.DataFrame, fh: int):
@@ -182,7 +202,7 @@ def evaluate(forecaster, y_test: pd.DataFrame, X_test: pd.DataFrame) -> tuple[pd
 def render(
     timeseries: OrderedDictType[str, pd.DataFrame],
     task_logger,
-    prefix: Optional[str] = None,
+    prefix: str | None = None,
     delete_from_disk: bool = True,
 ):
     """Render the timeseries as a single plot per (area, consumer_type)."""

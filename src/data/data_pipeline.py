@@ -8,11 +8,10 @@ from clearml import Dataset, Task, TaskTypes
 CURRENT_DIR = Path(__file__).parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-
 from configs.configs import DATASET_NAME, PROJECT_NAME
 from root import PROCESSED_DIR
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
 from src.data.lag_feature_generator import LagFeatureGenerator
 from src.data.time_series_processor import TimeSeriesProcessor
 from src.data.utils import get_cleaned_dataset
@@ -33,17 +32,13 @@ def prepare_training_data(df, test_size: float, random_state: int):
     return X_train, X_test, y_train, y_test
 
 
-def preprocessing_data(
-    df: pd.DataFrame, lag_time: int, warn_on_na: bool, drop_na: bool
-) -> pd.DataFrame:
+def preprocessing_data(df: pd.DataFrame, lag_time: int, warn_on_na: bool, drop_na: bool) -> pd.DataFrame:
     preprocessing_pipeline = Pipeline(
         [
             ("preprocessor", TimeSeriesProcessor()),
             (
                 "lag_feature_generator",
-                LagFeatureGenerator(
-                    lag=lag_time, warn_on_na=warn_on_na, drop_na=drop_na
-                ),
+                LagFeatureGenerator(lag=lag_time, warn_on_na=warn_on_na, drop_na=drop_na),
             ),
         ]
     )
@@ -61,9 +56,7 @@ def main(
     test_size: float,
     random_state: int,
 ):
-    df = get_cleaned_dataset(
-        dataset_task_id=dataset_task_id, dataset_id=dataset_id
-    )
+    df = get_cleaned_dataset(dataset_task_id=dataset_task_id, dataset_id=dataset_id)
     df = preprocessing_data(df, lag_time, warn_on_na, drop_na)
 
     save_path = PROCESSED_DIR / "processed.csv"
@@ -79,9 +72,7 @@ def main(
     clean_ds.upload(verbose=True)
     clean_ds.finalize()
 
-    X_train, X_test, y_train, y_test = prepare_training_data(
-        df, test_size, random_state
-    )
+    X_train, X_test, y_train, y_test = prepare_training_data(df, test_size, random_state)
 
     return X_train, X_test, y_train, y_test
 

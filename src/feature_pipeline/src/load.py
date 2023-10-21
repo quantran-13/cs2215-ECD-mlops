@@ -9,7 +9,7 @@ logger = get_logger("logs", __name__)
 
 
 def to_feature_store(data: pd.DataFrame, metadata: dict, parent_datasets: list[str] | None = None):
-    data.to_csv(PROCESSED_DIR / "processed.csv", index_label=["HourUTC"])
+    data.to_csv(PROCESSED_DIR / "processed.csv", index_label=["index"])
     save_json(metadata, PROCESSED_DIR / "metadata.json")
 
     ds = Dataset.create(

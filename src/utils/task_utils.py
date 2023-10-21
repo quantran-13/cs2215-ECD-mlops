@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
+
 import joblib
-from typing import Union
 from clearml import Task
 from src.utils.logger import get_logger
 
@@ -40,7 +40,7 @@ def load_json(file_path: Path) -> dict:
         return json.load(f)
 
 
-def save_model(model, model_path: Union[str, Path]):
+def save_model(model, model_path: str | Path):
     """
     Template for saving a model.
 
@@ -48,5 +48,16 @@ def save_model(model, model_path: Union[str, Path]):
         model: Trained model.
         model_path: Path to save the model.
     """
-
     joblib.dump(model, model_path, compress=True)
+
+
+def load_model(model_path: str | Path):
+    """
+    Template for loading a model.
+
+    Args:
+        model_path: Path to the model.
+
+    Returns: Loaded model.
+    """
+    return joblib.load(model_path)

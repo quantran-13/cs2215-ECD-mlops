@@ -64,4 +64,5 @@ if __name__ == "__main__":
     task.upload_artifact("metadata", metadata)
     logger.info("Successfully uploaded data and metadata in %.2f seconds.", time.time() - t1)
 
+    logger.info("=" * 80)
     print("Done!")
