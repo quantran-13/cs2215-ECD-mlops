@@ -1,5 +1,5 @@
-import warnings
 import os
+import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
@@ -7,18 +7,13 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from root import OUTPUT_DIR
-from sktime.forecasting.model_selection import (
-    ExpandingWindowSplitter,
-    ForecastingGridSearchCV,
-    ForecastingSkoptSearchCV,
-)
+from sktime.forecasting.model_selection import ExpandingWindowSplitter, ForecastingGridSearchCV
 from sktime.performance_metrics.forecasting import MeanAbsolutePercentageError
 from sktime.utils.plotting import plot_windows
 from src.training_pipeline.configs import search as search_configs
 from src.training_pipeline.src.data import load_dataset
 from src.training_pipeline.src.models import build_model
 from src.utils.logger import get_logger
-
 
 logger = get_logger("logs", __name__)
 

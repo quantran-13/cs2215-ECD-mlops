@@ -1,8 +1,7 @@
+import ast
 import sys
 import time
 from pathlib import Path
-import joblib
-import ast
 
 from clearml import Task, TaskTypes
 
@@ -84,4 +83,5 @@ if __name__ == "__main__":
     task.upload_artifact("metadata", results["metadata"])
     logger.info("Successfully uploaded model and metadata in %.2f seconds.", time.time() - t1)
 
+    logger.info("=" * 80)
     print("Done!")

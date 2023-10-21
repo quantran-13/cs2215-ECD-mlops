@@ -17,7 +17,7 @@ logger = get_logger("logs", __name__)
 
 
 def convert_txt_to_csv(input_filepath, output_filepath):
-    with open(input_filepath, "r") as input_file:
+    with open(input_filepath) as input_file:
         with open(output_filepath, "w", newline="") as output_file:
             reader = csv.reader(input_file, delimiter=";")
             writer = csv.writer(output_file)
@@ -54,4 +54,5 @@ if __name__ == "__main__":
     task.upload_artifact("data", df)
     logger.info("Successfully uploaded data and metadata in %.2f seconds.", time.time() - t1)
 
+    logger.info("=" * 80)
     print("Done!")
