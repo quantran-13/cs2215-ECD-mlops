@@ -14,7 +14,14 @@ logger = get_logger(__name__)
 
 
 if __name__ == "__main__":
-    pipe = PipelineController(name="ETL", project=PROJECT_NAME, version="0.0.1", add_pipeline_tags=True)
+    pipe = PipelineController(
+        name="ETL", 
+        project=PROJECT_NAME, 
+        version="0.0.1", 
+        add_pipeline_tags=True, 
+        repo="https://github.com/quantran-13/cs2215-ECD-mlops.git", 
+        repo_branch="develop"
+    )
     pipe.set_default_execution_queue("default")
 
     pipe.add_parameter("raw_artifacts_task_id", "b5f58a9b03c447ad8873f718e8a66cfc")

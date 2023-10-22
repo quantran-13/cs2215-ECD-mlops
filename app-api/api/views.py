@@ -56,6 +56,7 @@ async def get_predictions(area: int, consumer_type: int) -> Any:
     # NOTE: hard coded `task_id` for now
     task_id: str = "237e80b4832f46198179c6beae6cf75a"
     task_artifacts = ClearMLService.get_task_artifacts(task_id=task_id)
+    # print("list of artifacts: ", task_artifacts.__dict__)
 
     y = task_artifacts["y"].get()
     y = y.reset_index()
