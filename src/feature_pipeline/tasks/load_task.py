@@ -25,7 +25,7 @@ if __name__ == "__main__":
     args = {
         # "artifacts_task_id": "OVERWRITE_ME",
         # "feature_group_version": "OVERWRITE_ME",
-        "artifacts_task_id": "95a37c105d724133bc38335e263648a8",
+        "artifacts_task_id": "ede1d79f91444392b3028e606ebae52a",
         "feature_group_version": 1,
     }
     task.connect(args)
@@ -34,18 +34,20 @@ if __name__ == "__main__":
     # task.execute_remotely()
 
     logger.info("Loading data to the feature store.")
-
-    task_artifacts = get_task_artifacts(task_id=args["artifacts_task_id"])
+    task_id = args["artifacts_task_id"]
+    task_artifacts = get_task_artifacts(task_id=task_id)
     data = task_artifacts["data"].get()
     metadata = task_artifacts["metadata"].get()
     metadata["feature_group_version"] = args["feature_group_version"]
 
     t1 = time.time()
-    ds = load.to_feature_store(data, metadata, parent_datasets=[metadata["raw_feature_store_id"]])
+    parent_datasets_id = metadata["feature_store_id"]
+    ds, metadata = load.to_feature_store(data, metadata, parent_datasets_id=parent_datasets_id)
     logger.info("Successfully loaded data to the feature store in %.2f seconds.", time.time() - t1)
 
+    task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
+
     t1 = time.time()
-    metadata["feature_store_id"] = ds.id
     task.upload_artifact("data", data)
     task.upload_artifact("metadata", metadata)
     logger.info("Successfully uploaded data and metadata in %.2f seconds.", time.time() - t1)

@@ -9,10 +9,8 @@ CURRENT_DIR = Path(__file__).parent.parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
 from configs.configs import PROJECT_NAME
-from root import MODEL_DIR
 from src.training_pipeline.src import hyperparameter_tuning as hpo
 from src.utils.logger import get_logger
-from src.utils.task_utils import save_model
 
 logger = get_logger("logs", __name__)
 
@@ -27,7 +25,7 @@ if __name__ == "__main__":
 
     args = {
         # "artifacts_task_id": "OVERWRITE_ME",
-        "artifacts_task_id": "a1cef1cc2ccb491e8e2601b4bd71195f",
+        "artifacts_task_id": "8568e970ffd440ad9070de0f314f37b7",
         "forecasting_horizon": 24,
         "k": 3,
         "lag_feature_lag_min": 1,
@@ -69,19 +67,8 @@ if __name__ == "__main__":
     task.upload_artifact("model_cfg", model_cfg)
 
     # Hyperparameter optimization
-    results = hpo.run(
-        task, task_id=args["artifacts_task_id"], model_cfg=model_cfg, fh=args["forecasting_horizon"], k=args["k"]
-    )
+    hpo.run(task, task_id=args["artifacts_task_id"], model_cfg=model_cfg, fh=args["forecasting_horizon"], k=args["k"])
     logger.info("Successfully ran hyperparameter tuning task in %.2f seconds.", time.time() - t1)
-
-    # Save model and metadata
-    t1 = time.time()
-    logger.info("Uploading model and metadata...")
-    save_model(results["model"], MODEL_DIR / "model.pkl")
-    task.upload_artifact("model", MODEL_DIR / "model.pkl")
-    task.upload_artifact("best_forecaster", results["model"])
-    task.upload_artifact("metadata", results["metadata"])
-    logger.info("Successfully uploaded model and metadata in %.2f seconds.", time.time() - t1)
 
     logger.info("=" * 80)
     print("Done!")

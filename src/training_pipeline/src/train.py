@@ -137,6 +137,7 @@ def run_from_best_config(task, data_task_id: str, hpo_task_id: str, fh: int = 24
     task.upload_artifact("model", MODEL_DIR / "model.pkl")
     task.upload_artifact("best_forecaster", best_forecaster)
     task.upload_artifact("metadata", metadata)
+    task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
     logger.info("Successfully saved best model in %.2f seconds.", time.time() - t1)
 
 
