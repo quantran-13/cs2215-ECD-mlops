@@ -1,12 +1,13 @@
-import os
 import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
+import os
+import time
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from root import OUTPUT_DIR
+from root import OUTPUT_DIR, MODEL_DIR
 from sktime.forecasting.model_selection import ExpandingWindowSplitter, ForecastingGridSearchCV
 from sktime.performance_metrics.forecasting import MeanAbsolutePercentageError
 from sktime.utils.plotting import plot_windows
@@ -14,11 +15,12 @@ from src.training_pipeline.configs import search as search_configs
 from src.training_pipeline.src.data import load_dataset
 from src.training_pipeline.src.models import build_model
 from src.utils.logger import get_logger
+from src.utils.task_utils import save_model
 
 logger = get_logger("logs", __name__)
 
 
-def run(task, task_id: str, model_cfg: dict, fh: int = 24, k: int = 3) -> dict:
+def run(task, task_id: str, model_cfg: dict, fh: int = 24, k: int = 3):
     """Run hyperparameter optimization search.
 
     Args:
@@ -27,9 +29,6 @@ def run(task, task_id: str, model_cfg: dict, fh: int = 24, k: int = 3) -> dict:
              If none, it will try to load the version from the cached feature_view_metadata.json file. Defaults to None.
         training_dataset_version (Optional[int], optional): feature store - feature view - training dataset version.
             If none, it will try to load the version from the cached feature_view_metadata.json file. Defaults to None.
-
-    Returns:
-        dict: Dictionary containing metadata about the hyperparameter optimization run.
     """
     task_logger = task.get_logger()
 
@@ -60,11 +59,15 @@ def run(task, task_id: str, model_cfg: dict, fh: int = 24, k: int = 3) -> dict:
     logger.info("Mean fit time in %.2f seconds.", hpo_result["mean_fit_time"].mean())
     logger.info("Mean prediction time in %.2f seconds.", hpo_result["mean_prediction_time"].mean())
 
-    return_dict = {
-        "model": results.best_forecaster_,
-        "metadata": metadata,
-    }
-    return return_dict
+    # Save best model.
+    logger.info("Saving best model...")
+    t1 = time.time()
+    save_model(results.best_forecaster_, MODEL_DIR / "model.pkl")
+    task.upload_artifact("model", MODEL_DIR / "model.pkl")
+    task.upload_artifact("best_forecaster", results.best_forecaster_)
+    task.upload_artifact("metadata", metadata)
+    task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
+    logger.info("Successfully saved best model in %.2f seconds.", time.time() - t1)
 
 
 def run_hyperparameter_optimization(
@@ -117,11 +120,10 @@ def run_hyperparameter_optimization(
 def render_cv_scheme(cv, y_train: pd.DataFrame, task_logger, delete_from_disk: bool = True):
     """Render the CV scheme used for training and log it."""
     random_time_series = y_train.groupby(level=[0, 1]).get_group((1, 111)).reset_index(level=[0, 1], drop=True)
-    fig = plot_windows(cv, random_time_series)
+    plot_windows(cv, random_time_series)
 
     save_path = str(OUTPUT_DIR / "cv_scheme.png")
     plt.savefig(save_path)
-    plt.close(fig)
 
     task_logger.report_image(title="CV scheme", series="CV scheme", iteration=0, local_path=save_path)
 

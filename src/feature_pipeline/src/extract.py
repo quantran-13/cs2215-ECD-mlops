@@ -38,7 +38,7 @@ def from_file(
             standard output directory.
 
     Returns:
-          A tuple of a Pandas DataFrame containing the exported data and a dictionary of metadata.
+        tuple[pd.DataFrame, dict[str, Any]]: The extracted data and the metadata.
     """
     export_start, export_end = _compute_extraction_window(
         export_end_reference_datetime=export_end_reference_datetime,

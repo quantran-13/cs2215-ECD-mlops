@@ -25,10 +25,12 @@ if __name__ == "__main__":
 
     args = {
         # "artifacts_task_id": "OVERWRITE_ME",
-        "artifacts_task_id": "3dfe30f7f8ca4619b535e43f64f66d05",
-        "export_end_reference_datetime": "",
+        # "feature_store_id": "OVERWRITE_ME",
+        "export_end_reference_datetime": "2023-04-01 00:00",
         "days_delay": 15,
         "days_export": 30,
+        "artifacts_task_id": "3dfe30f7f8ca4619b535e43f64f66d05",
+        "feature_store_id": "649430da2e0247db8ef3a073e30223b2",
     }
     task.connect(args)
     print(f"Arguments: {args}")
@@ -56,8 +58,11 @@ if __name__ == "__main__":
             f"Could not extract the expected number of samples from the api: {metadata['num_unique_samples_per_time_series']} < {days_export * 24}. \
             Check out the API at: https://www.energidataservice.dk/tso-electricity/ConsumptionDE35Hour "
         )
-    metadata["raw_feature_store_id"] = task_artifacts["feature_store"].get()
+    # metadata["feature_store_id"] = task_artifacts["feature_store"].get()
+    metadata["feature_store_id"] = args["feature_store_id"]
     logger.info("Successfully extracted data in %.2f seconds.", time.time() - t1)
+
+    task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
 
     t1 = time.time()
     task.upload_artifact("data", data)

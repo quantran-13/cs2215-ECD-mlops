@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     args = {
         # "artifacts_task_id": "OVERWRITE_ME",
-        "artifacts_task_id": "09a03899dcc541268b6371a69e6da269",
+        "artifacts_task_id": "384713a685d944e188769c73ccb5c6b2",
     }
     task.connect(args)
     print(f"Arguments: {args}")
@@ -42,6 +42,8 @@ if __name__ == "__main__":
     logger.info("Successfully built validation expectation suite in %.2f seconds.", time.time() - t1)
     result = validate.validate(data, validation_expectation_suite)
     logger.info("Successfully validated data in %.2f seconds.", time.time() - t1)
+
+    task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
 
     t1 = time.time()
     task.upload_artifact("data", data)

@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     args = {
         # "artifacts_task_id": "OVERWRITE_ME",
-        "artifacts_task_id": "bc68eb8605724437b300170417385b0a",
+        "artifacts_task_id": "58764c6b9cac4049b5d897488d3302a1",
     }
     task.connect(args)
     print(f"Arguments: {args}")
@@ -41,6 +41,8 @@ if __name__ == "__main__":
     t1 = time.time()
     data = transform.transform(data)
     logger.info("Successfully transformed data in %.2f seconds.", time.time() - t1)
+
+    task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
 
     t1 = time.time()
     task.upload_artifact("data", data)

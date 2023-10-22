@@ -57,6 +57,7 @@ def predict(task, data_task_id: str, training_task_id: str, fh: int = 24):
     ds = save(task, X, y, predictions, metadata)
     metadata["predictions_dataset_id"] = ds.id
     task.upload_artifact("metadata", metadata)
+    task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
     logger.info("Successfully saved predictions in %.2f seconds.", time.time() - t1)
 
 
@@ -114,9 +115,9 @@ def forecast(model, X: pd.DataFrame, fh: int = 24):
 
 def save(task, X: pd.DataFrame, y: pd.DataFrame, predictions: pd.DataFrame, metadata: dict):
     """Save the input data, target data, and predictions."""
-    task.register_artifact("X", X)
-    task.register_artifact("y", y)
-    task.register_artifact("predictions", predictions)
+    task.upload_artifact("X", X)
+    task.upload_artifact("y", y)
+    task.upload_artifact("predictions", predictions)
 
     predictions.to_csv(PROCESSED_DIR / "predictions.csv", index_label=["area", "consumer_type", "datetime_utc"])
     save_json(metadata, PROCESSED_DIR / "batch_metadata.json")
@@ -127,7 +128,11 @@ def save(task, X: pd.DataFrame, y: pd.DataFrame, predictions: pd.DataFrame, meta
         dataset_version=metadata["feature_group_version"],
         # use_current_task=True,
         parent_datasets=[metadata["feature_store_id"]],
-        dataset_tags=[metadata["predictions_datetime_utc_start"], metadata["predictions_datetime_utc_end"]],
+        dataset_tags=[
+            "prediction",
+            metadata["predictions_datetime_utc_start"],
+            metadata["predictions_datetime_utc_end"],
+        ],
     )
 
     ds.add_files(path=PROCESSED_DIR / "predictions.csv", verbose=True)

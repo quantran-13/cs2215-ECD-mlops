@@ -26,8 +26,8 @@ if __name__ == "__main__":
         # "data_task_id": "OVERWRITE_ME",
         # "hpo_task_id": "OVERWRITE_ME",
         "forecasting_horizon": 24,
-        "data_task_id": "a1cef1cc2ccb491e8e2601b4bd71195f",
-        "hpo_task_id": "30dcb4682efe478cb37ea8b1e7d86f69",
+        "data_task_id": "8568e970ffd440ad9070de0f314f37b7",
+        "hpo_task_id": "a07d1f54a8654f37be8bff1847767e83",
     }
     task.connect(args)
     print(f"Arguments: {args}")
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     data_task_id = args["data_task_id"]
     hpo_task_id = args["hpo_task_id"]
     fh = args["forecasting_horizon"]
-    results = train.run_from_best_config(task, data_task_id=data_task_id, hpo_task_id=hpo_task_id, fh=fh)
+    train.run_from_best_config(task, data_task_id=data_task_id, hpo_task_id=hpo_task_id, fh=fh)
     logger.info("Successfully ran training task in %.2f seconds.", time.time() - t1)
 
     logger.info("=" * 80)

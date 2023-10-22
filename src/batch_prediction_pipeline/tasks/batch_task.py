@@ -26,8 +26,8 @@ if __name__ == "__main__":
         # "data_task_id": "OVERWRITE_ME",
         # "training_task_id": "OVERWRITE_ME",
         "forecasting_horizon": 24,
-        "data_task_id": "a1cef1cc2ccb491e8e2601b4bd71195f",
-        "training_task_id": "df898d2e83374edf828ae469c46d47cc",
+        "data_task_id": "8568e970ffd440ad9070de0f314f37b7",
+        "training_task_id": "fcafa4c31b3c4b31bb184594b5b63cea",
     }
     task.connect(args)
     print(f"Arguments: {args}")

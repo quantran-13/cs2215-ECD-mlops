@@ -9,26 +9,31 @@ logger = utils.get_logger(__name__)
 
 
 def compute(feature_view_version: int | None = None) -> None:
-    """Computes the metrics on the latest n_days of predictions.
+    """Compute the metrics on the latest n_days of predictions.
 
     Args:
         feature_view_version: The version of the feature view to load data from the feature store. If None is provided, it will try to load it from the cached feature_view_metadata.json file.
     """
+    # if feature_view_version is None:
+    # feature_view_metadata = utils.load_json("feature_view_metadata.json")
+    # feature_view_version = feature_view_metadata["feature_view_version"]
 
-    if feature_view_version is None:
-        feature_view_metadata = utils.load_json("feature_view_metadata.json")
-        feature_view_version = feature_view_metadata["feature_view_version"]
+    task_id = "237e80b4832f46198179c6beae6cf75a"
+    task_artifacts = get_task_artifacts(task_id=task_id)
+    X = task_artifacts["X"].get()
+    y = task_artifacts["y"].get()
+    metadata = task_artifacts["metadata"].get()
 
     logger.info("Loading old predictions...")
-    bucket = utils.get_bucket()
-    predictions = utils.read_blob_from(bucket=bucket, blob_name=f"predictions_monitoring.parquet")
+    predictions = task_artifacts["predictions"].get()
     if predictions is None or len(predictions) == 0:
         logger.info("Haven't found any predictions to compute the metrics on. Exiting...")
 
         return
-    predictions.index = predictions.index.set_levels(
-        pd.to_datetime(predictions.index.levels[2], unit="h").to_period("H"), level=2
-    )
+
+    predictions.reset_index(inplace=True)
+    predictions["datetime_utc"] = pd.PeriodIndex(predictions["datetime_utc"], freq="H")
+    predictions = predictions.set_index(["area", "consumer_type", "datetime_utc"]).sort_index()
     logger.info("Successfully loaded old predictions.")
 
     logger.info("Connecting to the feature store...")
@@ -94,7 +99,3 @@ def compute(feature_view_version: int | None = None) -> None:
         data=latest_observations[["energy_consumption"]],
     )
     logger.info("Successfully saved new metrics.")
-
-
-if __name__ == "__main__":
-    compute()
