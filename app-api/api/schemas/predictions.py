@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 
 class PredictionResults(BaseModel):
-    datetime_utc: List[int]
+    datetime_utc: List[str]
     energy_consumption: List[float]
-    preds_datetime_utc: List[int]
+    preds_datetime_utc: List[str]
     preds_energy_consumption: List[float]
 
 

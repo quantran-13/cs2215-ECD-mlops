@@ -65,34 +65,7 @@ def build_data_plot(area: int, consumer_type: int):
     return fig
 
 
-# def build_dataframe(datetime_utc: List[int], energy_consumption_values: List[float]):
-#     """
-#     Build DataFrame for plotting from timestamps and energy consumption values.
-
-#     Args:
-#         datetime_utc (List[int]): list of timestamp values in UTC
-#         values (List[float]): list of energy consumption values
-#     """
-
-#     df = pd.DataFrame(
-#         list(zip(datetime_utc, energy_consumption_values)),
-#         columns=["datetime_utc", "energy_consumption"],
-#     )
-#     df["datetime_utc"] = pd.to_datetime(
-#         df["datetime_utc"], 
-#         unit="h" # NOTE: WTF is this ???
-#     )
-
-#     # Resample to hourly frequency to make the data continuous.
-#     df = df.set_index("datetime_utc")
-#     df = df.resample("H").asfreq()
-#     df = df.reset_index()
-
-#     return df
-
-
-
-def build_dataframe(datetime_utc: list[int], energy_consumption_values: list[float]):
+def build_dataframe(datetime_utc: list[str], energy_consumption_values: list[float]):
     """
     Build DataFrame for plotting from timestamps and energy consumption values.
 

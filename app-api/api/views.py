@@ -1,10 +1,11 @@
 # import gcsfs
-from typing import Any, List
 
 import pandas as pd
 from fastapi import APIRouter, HTTPException
+from typing import Any, List
 
 from api import schemas
+from .clearml_service import ClearMLService
 
 
 api_router = APIRouter()
@@ -28,10 +29,7 @@ def consumer_type_values() -> List:
     """
     Retrieve unique consumer types.
     """
-    # # Download the data from GCS.
-    # X = pd.read_parquet(f"{get_settings().GCP_BUCKET}/X.parquet", filesystem=fs)
-    # unique_consumer_type = list(X.index.unique(level="consumer_type"))
-    # return {"values": unique_consumer_type}
+    # NOTE: hard-code for now
     all_consumer_types = [111, 112, 119, 121, 122, 123, 130, 211, 212, 215, 220, 310, 320, 330, 340, 350, 360, 370, 381, 
                       382, 390, 410, 421, 422, 431, 432, 433, 441, 442, 443, 444, 445, 446, 447, 450, 461, 462, 999]  # fmt: skip
     return {"values": all_consumer_types}
@@ -42,15 +40,7 @@ def area_values() -> List:
     """
     Retrieve unique areas.
     """
-    # # Download the data from GCS.
-    # X = pd.read_parquet(f"{get_settings().GCP_BUCKET}/X.parquet", filesystem=fs)
-    # unique_area = list(X.index.unique(level="area"))
-    # return {"values": unique_area}
-    # return {"values": [
-    #     "dummy_value",
-    #     "dummy_value",
-    #     "dummy_value"
-    # ]}
+    # NOTE: hard-code for now
     return {"values": [1, 2]}
 
 
@@ -63,77 +53,33 @@ async def get_predictions(area: int, consumer_type: int) -> Any:
     """
     Get forecasted predictions based on the given area and consumer type.
     """
+    # NOTE: hard coded `task_id` for now
+    task_id: str = "237e80b4832f46198179c6beae6cf75a"
+    task_artifacts = ClearMLService.get_task_artifacts(task_id=task_id)
 
-    # # Download the data from GCS.
-    # train_df = pd.read_parquet(f"{get_settings().GCP_BUCKET}/y.parquet", filesystem=fs)
-    # preds_df = pd.read_parquet(
-    #     f"{get_settings().GCP_BUCKET}/predictions.parquet", filesystem=fs
-    # )
+    y = task_artifacts["y"].get()
+    y = y.reset_index()
 
-    # # Query the data for the given area and consumer type.
-    # try:
-    #     train_df = train_df.xs((area, consumer_type), level=["area", "consumer_type"])
-    #     preds_df = preds_df.xs((area, consumer_type), level=["area", "consumer_type"])
-    # except KeyError:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=f"No data found for the given area and consumer type: {area}, {consumer_type}",
-    #     )
+    pred = task_artifacts["predictions"].get()
+    pred = pred.reset_index()
 
-    # if len(train_df) == 0 or len(preds_df) == 0:
-    #     raise HTTPException(
-    #         status_code=404,
-    #         detail=f"No data found for the given area and consumer type: {area}, {consumer_type}",
-    #     )
+    # NOTE: query `consumer_type` & `area`
+    y_filtered_df = y[(y["consumer_type"] == consumer_type) & (y["area"] == area)]
+    pred_filtered_df = pred[(pred["consumer_type"] == consumer_type) & (pred["area"] == area)]
 
-    # # Return only the latest week of observations.
-    # train_df = train_df.sort_index().tail(24 * 7)
+    preds_datetime_utc = pred_filtered_df["datetime_utc"].to_list()
+    datetime_utc = y_filtered_df["datetime_utc"].to_list()
 
-    # # Prepare data to be returned.
-    # datetime_utc = train_df.index.get_level_values("datetime_utc").to_list()
-    # energy_consumption = train_df["energy_consumption"].to_list()
+    energy_consumption = y_filtered_df["energy_consumption"].to_list()
+    preds_energy_consumption = pred_filtered_df["energy_consumption"].to_list()
 
-    # preds_datetime_utc = preds_df.index.get_level_values("datetime_utc").to_list()
-    # preds_energy_consumption = preds_df["energy_consumption"].to_list()
-
-    # results = {
-    #     "datetime_utc": datetime_utc,
-    #     "energy_consumption": energy_consumption,
-    #     "preds_datetime_utc": preds_datetime_utc,
-    #     "preds_energy_consumption": preds_energy_consumption,
-    # }
-    # return results
-
-    return {
-        "datetime_utc": [
-            1697381425, 
-            1697467825, 
-            1697554225, 
-            1697640625, 
-            1697727025,
-        ],
-        "energy_consumption": [
-            16.36861518171509, 
-            34.12319847140227, 
-            39.40401013631387, 
-            25.713698195592627, 
-            33.80557777222082 
-        ],
-        "preds_datetime_utc": [
-            1697381425, 
-            1697467825, 
-            1697554225, 
-            1697640625, 
-            1697727025,
-        ],
-        "preds_energy_consumption": [
-            16.36861518171509 - 5, 
-            34.12319847140227 - 5, 
-            39.40401013631387 - 10, 
-            25.713698195592627 - 2, 
-            33.80557777222082 - 3 
-        ],
+    results = {
+        "datetime_utc": datetime_utc,
+        "energy_consumption": energy_consumption,
+        "preds_datetime_utc": preds_datetime_utc,
+        "preds_energy_consumption": preds_energy_consumption,
     }
+    return results
 
 
 @api_router.get(
