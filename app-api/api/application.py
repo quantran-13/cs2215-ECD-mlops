@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.views import api_router
+from api.views import api_router 
+from api.cronjob import trigger_api_router
 # from api.config import get_settings
 
 
@@ -23,6 +24,7 @@ def get_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(api_router, prefix=f"/api/v1")
+    app.include_router(api_router, prefix=f"/api/v1", tags=["Application API"])
+    app.include_router(trigger_api_router, prefix=f"/trigger/v1", tags=["Trigger API"])
 
     return app
