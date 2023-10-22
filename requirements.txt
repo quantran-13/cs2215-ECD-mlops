@@ -18,3 +18,5 @@ pep8-naming==0.13.3
 pre_commit==3.4.0
 coverage==7.3.2
 mypy==1.6.0
+streamlit==1.27.2
+plotly==5.17.0
