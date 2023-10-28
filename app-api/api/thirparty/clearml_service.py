@@ -64,17 +64,9 @@ class ClearMLService:
         project_name: str = PROJECT_NAME,
         task_name: str = "Extracting data",
         task_type=TaskTypes.data_processing,
+        args: list[tuple[str,any]] = None, 
         # tags="data-pipeline",
     ) -> Task:
-        args = {
-            # "artifacts_task_id": "OVERWRITE_ME",
-            # "feature_store_id": "OVERWRITE_ME",
-            "export_end_reference_datetime": "2023-04-01 00:00",
-            "days_delay": 15,
-            "days_export": 30,
-            "artifacts_task_id": "3dfe30f7f8ca4619b535e43f64f66d05",
-            "feature_store_id": "649430da2e0247db8ef3a073e30223b2",
-        }
 
         task = Task.create(
             project_name=project_name,
@@ -84,7 +76,7 @@ class ClearMLService:
             task_type=task_type,
             script="./src/feature_pipeline/tasks/extract_task.py",
             working_directory=".",
-            # argparse_args=args,
+            argparse_args=args,
         )
         return task
 

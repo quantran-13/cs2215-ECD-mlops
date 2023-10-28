@@ -11,10 +11,27 @@ clearml_router = APIRouter()
 def hello_world() -> dict:
     return {"data": "Hello World"}
 
+from pydantic import BaseModel
+class IExtractDataRequest(BaseModel): 
+    export_end_reference_datetime: str
+    days_delay: int
+    days_export: int
+    artifacts_task_id: str
+    feature_store_id: str
 
-@clearml_router.get("/feature_pipeline/extract", status_code=200)
-def run_extract_data() -> dict:
-    task = ClearMLService.get_extract_task()
+
+@clearml_router.post("/feature_pipeline/extract", status_code=200)
+def run_extract_data(req: IExtractDataRequest) -> dict:
+    task = ClearMLService.get_extract_task(
+        args = [
+            # "artifacts_task_id": "OVERWRITE_ME",
+            ("export_end_reference_datetime", req.export_end_reference_datetime),
+            ("days_delay", req.days_delay),
+            ("days_export", req.days_export),
+            ("artifacts_task_id", req.artifacts_task_id),
+            ("feature_store_id", req.feature_store_id),
+        ]
+    )
     Task.enqueue(
         task=task,
         queue_name="default",
