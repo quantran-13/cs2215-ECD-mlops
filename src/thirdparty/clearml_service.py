@@ -5,8 +5,7 @@ from clearml import Model, Task
 # logger = get_logger("logs", __name__)
 
 
-class ClearMLService:     
-
+class ClearMLService:
     @staticmethod
     def get_task_artifacts(task_id: str) -> dict:
         task = Task.get_task(task_id=task_id)
@@ -42,15 +41,9 @@ class ClearMLService:
                 tags=m.tags,
                 task_id=m.task,
                 task_name=task.name,
-                startedAt=task.data.started.strftime("%Y-%m-%d %H:%M:%S")
-                if task.data.started
-                else None,
-                createdAt=task.data.created.strftime("%Y-%m-%d %H:%M:%S")
-                if task.data.created
-                else None,
-                completedAt=task.data.completed.strftime("%Y-%m-%d %H:%M:%S")
-                if task.data.completed
-                else None,
+                startedAt=task.data.started.strftime("%Y-%m-%d %H:%M:%S") if task.data.started else None,
+                createdAt=task.data.created.strftime("%Y-%m-%d %H:%M:%S") if task.data.created else None,
+                completedAt=task.data.completed.strftime("%Y-%m-%d %H:%M:%S") if task.data.completed else None,
                 status=task.data.status.value,
                 type=task.task_type.value,
                 labels=m.labels,
@@ -64,11 +57,11 @@ class ClearMLService:
         return model_list
 
 
-    
 if __name__ == "__main__":
     from pprint import pprint
+
     pprint(
         ClearMLService.list_models_from_registry(
-            project_name="cs2215-project", 
+            project_name="cs2215-project",
         )
-    ) 
+    )

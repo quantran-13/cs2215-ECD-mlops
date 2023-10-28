@@ -2,7 +2,7 @@ from clearml import Model, Task, TaskTypes
 
 PROJECT_NAME: str = "cs2215-project"
 DATASET_NAME: str = "enegy_consumption"
-REPO = "https://github.com/quantran-13/cs2215-ECD-mlops.git"  
+REPO = "https://github.com/quantran-13/cs2215-ECD-mlops.git"
 BRANCH = "develop"
 
 # from src.utils.logger import get_logger
@@ -10,7 +10,7 @@ BRANCH = "develop"
 # logger = get_logger("logs", __name__)
 
 
-class ClearMLService:     
+class ClearMLService:
     @staticmethod
     def get_task_artifacts(task_id: str) -> dict:
         task = Task.get_task(task_id=task_id)
@@ -46,15 +46,9 @@ class ClearMLService:
                 tags=m.tags,
                 task_id=m.task,
                 task_name=task.name,
-                startedAt=task.data.started.strftime("%Y-%m-%d %H:%M:%S")
-                if task.data.started
-                else None,
-                createdAt=task.data.created.strftime("%Y-%m-%d %H:%M:%S")
-                if task.data.created
-                else None,
-                completedAt=task.data.completed.strftime("%Y-%m-%d %H:%M:%S")
-                if task.data.completed
-                else None,
+                startedAt=task.data.started.strftime("%Y-%m-%d %H:%M:%S") if task.data.started else None,
+                createdAt=task.data.created.strftime("%Y-%m-%d %H:%M:%S") if task.data.created else None,
+                completedAt=task.data.completed.strftime("%Y-%m-%d %H:%M:%S") if task.data.completed else None,
                 status=task.data.status.value,
                 type=task.task_type.value,
                 labels=m.labels,
@@ -65,11 +59,10 @@ class ClearMLService:
         ]
         return model_list
 
-
     @staticmethod
     def get_extract_task(
         project_name: str = PROJECT_NAME,
-        task_name:str = "Extracting data", 
+        task_name: str = "Extracting data",
         task_type=TaskTypes.data_processing,
         # tags="data-pipeline",
     ) -> Task:
@@ -86,9 +79,9 @@ class ClearMLService:
         task = Task.create(
             project_name=project_name,
             task_name=task_name,
-            repo=REPO, 
-            branch=BRANCH, 
-            task_type=task_type, 
+            repo=REPO,
+            branch=BRANCH,
+            task_type=task_type,
             script="./src/feature_pipeline/tasks/extract_task.py",
             working_directory=".",
             # argparse_args=args,
@@ -110,11 +103,11 @@ class ClearMLService:
         task = Task.create(
             project_name=project_name,
             task_name=task_name,
-            repo=REPO, 
-            branch=BRANCH, 
+            repo=REPO,
+            branch=BRANCH,
             script="./src/feature_pipeline/tasks/transform_task.py",
-            task_type=task_type, 
-            # tags=tags, 
+            task_type=task_type,
+            # tags=tags,
             working_directory=".",
             # argparse_args=args,
         )
@@ -134,11 +127,11 @@ class ClearMLService:
         task = Task.create(
             project_name=project_name,
             task_name=task_name,
-            repo=REPO, 
-            branch=BRANCH, 
+            repo=REPO,
+            branch=BRANCH,
             script="./src/feature_pipeline/tasks/load_task.py",
-            task_type=task_type, 
-            # tags=tags, 
+            task_type=task_type,
+            # tags=tags,
             working_directory=".",
             # argparse_args=args,
         )
@@ -158,22 +151,22 @@ class ClearMLService:
         task = Task.create(
             project_name=project_name,
             task_name=task_name,
-            repo=REPO, 
-            branch=BRANCH, 
+            repo=REPO,
+            branch=BRANCH,
             script="./src/feature_pipeline/tasks/validate_task.py",
-            task_type=task_type, 
-            # tags=tags, 
+            task_type=task_type,
+            # tags=tags,
             working_directory=".",
             # argparse_args=args,
         )
         return task
 
 
-
 if __name__ == "__main__":
     from pprint import pprint
+
     pprint(
         ClearMLService.list_models_from_registry(
-            project_name="cs2215-project", 
+            project_name="cs2215-project",
         )
-    ) 
+    )

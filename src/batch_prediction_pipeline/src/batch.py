@@ -4,14 +4,14 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 import time
-from clearml import Dataset
 
+import pandas as pd
+from clearml import Dataset
 from configs.configs import DATASET_NAME, PROJECT_NAME
 from root import PROCESSED_DIR
-import pandas as pd
 from src.batch_prediction_pipeline.src.data import load_data
-from src.utils.task_utils import get_task_artifacts, save_json
 from src.utils.logger import get_logger
+from src.utils.task_utils import get_task_artifacts, save_json
 
 logger = get_logger("logs", __name__)
 

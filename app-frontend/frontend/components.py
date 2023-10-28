@@ -1,9 +1,8 @@
 from typing import List
-import requests
 
 import pandas as pd
 import plotly.graph_objects as go
-
+import requests
 from settings import API_URL
 
 
@@ -13,9 +12,7 @@ def build_data_plot(area: int, consumer_type: int):
     """
 
     # Get predictions from API.
-    response = requests.get(
-        API_URL / "predictions" / f"{area}" / f"{consumer_type}", verify=False
-    )
+    response = requests.get(API_URL / "predictions" / f"{area}" / f"{consumer_type}", verify=False)
     if response.status_code != 200:
         # If the response is invalid, build empty dataframes in the proper format.
         train_df = build_dataframe([], [])
@@ -80,7 +77,7 @@ def build_dataframe(datetime_utc: list[str], energy_consumption_values: list[flo
     )
 
     df["datetime_utc"] = pd.to_datetime(
-        df["datetime_utc"], 
+        df["datetime_utc"],
     )
 
     return df

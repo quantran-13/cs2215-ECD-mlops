@@ -1,8 +1,7 @@
+from api.clearml import clearml_router
+from api.views import api_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from api.views import api_router 
-from api.clearml import clearml_router
 
 
 def get_app() -> FastAPI:
@@ -23,15 +22,7 @@ def get_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(
-        api_router, 
-        prefix=f"/api/v1", 
-        tags=["Application API"]
-    )
-    app.include_router(
-        clearml_router, 
-        prefix=f"/clearml", 
-        tags=["Trigger API"]
-    )
+    app.include_router(api_router, prefix=f"/api/v1", tags=["Application API"])
+    app.include_router(clearml_router, prefix=f"/clearml", tags=["Trigger API"])
 
     return app
