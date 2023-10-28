@@ -1,7 +1,5 @@
-# import gcsfs
-
-from api.thirparty import data_model as idm
-from api.thirparty.clearml_service import ClearMLService
+from api.thirdparty import data_model as idm
+from api.thirdparty.clearml_service import ClearMLService
 from clearml import Task
 from fastapi import APIRouter
 
@@ -12,7 +10,21 @@ clearml_router = APIRouter()
 def hello_world() -> dict:
     return {"data": "Hello World"}
 
-
+@clearml_router.get("/v1/status", status_code=200)
+def get_task_status(
+    task_id: str, 
+    project_name: str | None = "cs2215-project", 
+) -> dict:
+    task = Task.get_task(
+        task_id=task_id, 
+        project_name=project_name
+    )
+    status = task.get_status()
+    return { 
+        "task_id": task.id, 
+        "status": status
+    } 
+ 
 @clearml_router.post("/v1/feature_pipeline/extract", status_code=200)
 def run_extract_data(req: idm.IExtractDataRequest) -> dict:
     task = ClearMLService.get_extract_task(

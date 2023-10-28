@@ -1,7 +1,7 @@
 from typing import Any
 
 from api import schemas
-from api.thirparty.clearml_service import ClearMLService
+from api.thirdparty.clearml_service import ClearMLService
 from fastapi import APIRouter
 
 api_router = APIRouter()
