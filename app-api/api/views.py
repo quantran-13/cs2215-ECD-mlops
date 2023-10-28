@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from api import schemas
 from api.thirparty.clearml_service import ClearMLService
@@ -26,13 +26,13 @@ def consumer_type_values() -> dict:
     Retrieve unique consumer types.
     """
     # NOTE: hard-code for now
-    all_consumer_types = [111, 112, 119, 121, 122, 123, 130, 211, 212, 215, 220, 310, 320, 330, 340, 350, 360, 370, 381, 
+    all_consumer_types = [111, 112, 119, 121, 122, 123, 130, 211, 212, 215, 220, 310, 320, 330, 340, 350, 360, 370, 381,
                       382, 390, 410, 421, 422, 431, 432, 433, 441, 442, 443, 444, 445, 446, 447, 450, 461, 462, 999]  # fmt: skip
     return {"values": all_consumer_types}
 
 
 @api_router.get("/area_values", response_model=schemas.UniqueArea, status_code=200)
-def area_values() -> List:
+def area_values() -> list:
     """
     Retrieve unique areas.
     """

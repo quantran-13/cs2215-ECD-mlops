@@ -1,3 +1,4 @@
+import argparse
 import sys
 import time
 from pathlib import Path
@@ -15,25 +16,24 @@ from src.utils.task_utils import get_task_artifacts
 logger = get_logger("logs", __name__)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Validate task")
+    parser.add_argument(
+        "--artifacts-task-id", type=str, help="Artifacts task ID", default="7446859fb1be495496953cd28adc085b"
+    )
+    args = parser.parse_args()
+    print(f"Arguments: {args}")
+
     task = Task.init(
         project_name=PROJECT_NAME,
         task_name="Validating data",
         task_type=TaskTypes.data_processing,
         tags="data-pipeline",
     )
-
-    args = {
-        # "artifacts_task_id": "OVERWRITE_ME",
-        "artifacts_task_id": "384713a685d944e188769c73ccb5c6b2",
-    }
     task.connect(args)
-    print(f"Arguments: {args}")
-
     # task.execute_remotely()
 
     logger.info("Validating data.")
-
-    task_artifacts = get_task_artifacts(task_id=args["artifacts_task_id"])
+    task_artifacts = get_task_artifacts(task_id=args.artifacts_task_id)
     data = task_artifacts["data"].get()
     metadata = task_artifacts["metadata"].get()
 

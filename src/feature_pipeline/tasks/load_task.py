@@ -1,3 +1,4 @@
+import argparse
 import sys
 import time
 from pathlib import Path
@@ -15,30 +16,28 @@ from src.utils.task_utils import get_task_artifacts
 logger = get_logger("logs", __name__)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Load task")
+    parser.add_argument(
+        "--artifacts-task-id", type=str, help="Artifacts task ID", default="805c0653252a4e5594c916835abaccec"
+    )
+    parser.add_argument("--fg-ver", type=int, help="Feature group version", default=1)
+    args = parser.parse_args()
+    print(f"Arguments: {args}")
+
     task = Task.init(
         project_name=PROJECT_NAME,
         task_name="Loading data",
         task_type=TaskTypes.data_processing,
         tags="data-pipeline",
     )
-
-    args = {
-        # "artifacts_task_id": "OVERWRITE_ME",
-        # "feature_group_version": "OVERWRITE_ME",
-        "artifacts_task_id": "ede1d79f91444392b3028e606ebae52a",
-        "feature_group_version": 1,
-    }
     task.connect(args)
-    print(f"Arguments: {args}")
-
-    # task.execute_remotely()
 
     logger.info("Loading data to the feature store.")
-    task_id = args["artifacts_task_id"]
+    task_id = args.artifacts_task_id
     task_artifacts = get_task_artifacts(task_id=task_id)
     data = task_artifacts["data"].get()
     metadata = task_artifacts["metadata"].get()
-    metadata["feature_group_version"] = args["feature_group_version"]
+    metadata["feature_group_version"] = args.fg_ver
 
     t1 = time.time()
     parent_datasets_id = metadata["feature_store_id"]

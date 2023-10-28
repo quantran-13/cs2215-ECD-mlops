@@ -1,3 +1,4 @@
+import argparse
 import sys
 import time
 from pathlib import Path
@@ -16,25 +17,24 @@ logger = get_logger("logs", __name__)
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Transform task")
+    parser.add_argument(
+        "--artifacts-task-id", type=str, help="Artifacts task ID", default="68629139079948d197e1eebb8249c130"
+    )
+    args = parser.parse_args()
+    print(f"Arguments: {args}")
+
     task = Task.init(
         project_name=PROJECT_NAME,
         task_name="Transforming data",
         task_type=TaskTypes.data_processing,
         tags="data-pipeline",
     )
-
-    args = {
-        # "artifacts_task_id": "OVERWRITE_ME",
-        "artifacts_task_id": "58764c6b9cac4049b5d897488d3302a1",
-    }
     task.connect(args)
-    print(f"Arguments: {args}")
-
     # task.execute_remotely()
 
     logger.info("Transforming data.")
-
-    task_artifacts = get_task_artifacts(task_id=args["artifacts_task_id"])
+    task_artifacts = get_task_artifacts(task_id=args.artifacts_task_id)
     data = task_artifacts["data"].get()
     metadata = task_artifacts["metadata"].get()
 

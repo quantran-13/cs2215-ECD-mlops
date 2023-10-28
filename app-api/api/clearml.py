@@ -2,7 +2,7 @@
 
 from api.thirparty.clearml_service import ClearMLService
 from clearml import Task
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 clearml_router = APIRouter()
 

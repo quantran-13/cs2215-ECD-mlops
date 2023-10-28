@@ -5,8 +5,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 import os
 import time
-from collections import OrderedDict
-from typing import OrderedDict as OrderedDictType  # noqa
+from collections import OrderedDict  # noqa
+from collections import OrderedDict as OrderedDictType
 
 import matplotlib.pyplot as plt
 import numpy as np

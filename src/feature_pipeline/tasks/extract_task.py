@@ -1,3 +1,4 @@
+import argparse
 import datetime as dt
 import sys
 import time
@@ -16,40 +17,42 @@ from src.utils.task_utils import get_task_artifacts
 logger = get_logger("logs", __name__)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Extract task")
+    parser.add_argument(
+        "--artifacts-task-id", type=str, help="Artifacts task ID", default="3dfe30f7f8ca4619b535e43f64f66d05"
+    )
+    parser.add_argument("--fs-id", type=str, help="Feature store ID", default="fc0bbd2c1878466fa2d6e554ef3c8015")
+    parser.add_argument("--export-end-reference-datetime", type=str, help="Export end reference datetime")
+    parser.add_argument("--days-delay", type=int, help="Days delay", default=15)
+    parser.add_argument("--days-export", type=int, help="Days export", default=30)
+    args = parser.parse_args()
+
+    if args.export_end_reference_datetime is None:
+        args.export_end_reference_datetime = "2023-04-01 00:00"
+
+    print(f"Arguments: {args}")
+
     task = Task.init(
         project_name=PROJECT_NAME,
         task_name="Extracting data",
         task_type=TaskTypes.data_processing,
         tags="data-pipeline",
     )
-
-    args = {
-        # "artifacts_task_id": "OVERWRITE_ME",
-        # "feature_store_id": "OVERWRITE_ME",
-        "export_end_reference_datetime": "2023-04-01 00:00",
-        "days_delay": 15,
-        "days_export": 30,
-        "artifacts_task_id": "3dfe30f7f8ca4619b535e43f64f66d05",
-        "feature_store_id": "649430da2e0247db8ef3a073e30223b2",
-    }
     task.connect(args)
-    print(f"Arguments: {args}")
-
-    task.execute_remotely()
+    # task.execute_remotely()
 
     logger.info("Extracting data from API.")
-
-    task_artifacts = get_task_artifacts(task_id=args["artifacts_task_id"])
+    task_artifacts = get_task_artifacts(task_id=args.artifacts_task_id)
     data = task_artifacts["data"].get()
 
-    export_end_reference_datetime = args["export_end_reference_datetime"]
+    export_end_reference_datetime = args.export_end_reference_datetime
     if export_end_reference_datetime == "":
         export_end_reference_datetime = None
     else:
         export_end_reference_datetime = dt.datetime.strptime(export_end_reference_datetime, "%Y-%m-%d %H:%M")
 
-    days_delay = args["days_delay"]
-    days_export = args["days_export"]
+    days_delay = args.days_delay
+    days_export = args.days_export
 
     t1 = time.time()
     data, metadata = extract.from_file(data, export_end_reference_datetime, days_delay, days_export)
@@ -58,8 +61,7 @@ if __name__ == "__main__":
             f"Could not extract the expected number of samples from the api: {metadata['num_unique_samples_per_time_series']} < {days_export * 24}. \
             Check out the API at: https://www.energidataservice.dk/tso-electricity/ConsumptionDE35Hour "
         )
-    # metadata["feature_store_id"] = task_artifacts["feature_store"].get()
-    metadata["feature_store_id"] = args["feature_store_id"]
+    metadata["feature_store_id"] = args.fs_id
     logger.info("Successfully extracted data in %.2f seconds.", time.time() - t1)
 
     task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
