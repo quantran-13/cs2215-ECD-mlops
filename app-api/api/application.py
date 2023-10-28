@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.views import api_router 
-from api.cronjob import trigger_api_router
-# from api.config import get_settings
+from api.clearml import clearml_router
 
 
 def get_app() -> FastAPI:
@@ -11,7 +10,7 @@ def get_app() -> FastAPI:
 
     app = FastAPI(
         title="Energy Consumption API",
-        docs_url=f"/api/v1/docs",
+        docs_url=f"/api/docs",
         redoc_url=f"/api/v1/redoc",
         openapi_url=f"/api/v1/openapi.json",
     )
@@ -24,7 +23,15 @@ def get_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(api_router, prefix=f"/api/v1", tags=["Application API"])
-    app.include_router(trigger_api_router, prefix=f"/trigger/v1", tags=["Trigger API"])
+    app.include_router(
+        api_router, 
+        prefix=f"/api/v1", 
+        tags=["Application API"]
+    )
+    app.include_router(
+        clearml_router, 
+        prefix=f"/clearml", 
+        tags=["Trigger API"]
+    )
 
     return app

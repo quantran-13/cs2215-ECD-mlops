@@ -1,11 +1,8 @@
-# import gcsfs
-
-import pandas as pd
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter 
 from typing import Any, List
 
 from api import schemas
-from .clearml_service import ClearMLService
+from api.thirparty.clearml_service import ClearMLService
 
 
 api_router = APIRouter()
@@ -25,7 +22,7 @@ def health() -> dict:
 
 
 @api_router.get("/consumer_type_values", response_model=schemas.UniqueConsumerType, status_code=200)
-def consumer_type_values() -> List:
+def consumer_type_values() -> dict:
     """
     Retrieve unique consumer types.
     """
