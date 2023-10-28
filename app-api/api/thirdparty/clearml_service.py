@@ -4,8 +4,8 @@ from clearml import Model, Task, TaskTypes
 
 PROJECT_NAME: str = "cs2215-project"
 DATASET_NAME: str = "enegy_consumption"
-REPO = "https://github.com/quantran-13/cs2215-ECD-mlops.git"
-BRANCH = "develop"
+REPO: str = "https://github.com/quantran-13/cs2215-ECD-mlops.git"
+BRANCH: str = "develop"
 
 # from src.utils.logger import get_logger
 
@@ -75,6 +75,7 @@ class ClearMLService:
             repo=REPO,
             branch=BRANCH,
             script="./src/feature_pipeline/tasks/extract_task.py",
+            requirements_file="../requirements.txt",
             working_directory=".",
             argparse_args=args,
             packages=True,
@@ -95,6 +96,7 @@ class ClearMLService:
             repo=REPO,
             branch=BRANCH,
             script="./src/feature_pipeline/tasks/transform_task.py",
+            requirements_file="../requirements.txt",
             working_directory=".",
             argparse_args=args,
             packages=True,
@@ -115,6 +117,7 @@ class ClearMLService:
             repo=REPO,
             branch=BRANCH,
             script="./src/feature_pipeline/tasks/validate_task.py",
+            requirements_file="../requirements.txt",
             working_directory=".",
             argparse_args=args,
             packages=True,
@@ -135,6 +138,7 @@ class ClearMLService:
             repo=REPO,
             branch=BRANCH,
             script="./src/feature_pipeline/tasks/load_task.py",
+            requirements_file="../requirements.txt",
             working_directory=".",
             argparse_args=args,
             packages=True,
@@ -155,6 +159,7 @@ class ClearMLService:
             repo=REPO,
             branch=BRANCH,
             script="./src/training_pipeline/tasks/hyperparameter_tuning_task.py",
+            requirements_file="../requirements.txt",
             working_directory=".",
             argparse_args=args,
             packages=True,
@@ -175,6 +180,7 @@ class ClearMLService:
             repo=REPO,
             branch=BRANCH,
             script="./src/training_pipeline/tasks/train_task.py",
+            requirements_file="../requirements.txt",
             working_directory=".",
             argparse_args=args,
             packages=True,

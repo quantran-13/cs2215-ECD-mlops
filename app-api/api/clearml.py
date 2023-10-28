@@ -15,7 +15,6 @@ def hello_world() -> dict:
 
 @clearml_router.post("/v1/feature_pipeline/extract", status_code=200)
 def run_extract_data(req: idm.IExtractDataRequest) -> dict:
-    print(req)
     task = ClearMLService.get_extract_task(
         args=[
             ("artifacts_task_id", req.artifacts_task_id),
@@ -29,7 +28,7 @@ def run_extract_data(req: idm.IExtractDataRequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id}
+    return {"task_id": task.id, "status": task.get_status()}
 
 
 @clearml_router.post("/v1/feature_pipeline/transform", status_code=200)
@@ -63,9 +62,7 @@ def run_validate_data(req: idm.IValidateDataRequest) -> dict:
 @clearml_router.post("/v1/feature_pipeline/load", status_code=200)
 def run_load_data(req: idm.ILoadDataRequest) -> dict:
     task = ClearMLService.get_load_task(
-        args=[
-            ("artifacts_task_id", req.artifacts_task_id),
-        ]
+        args=[("artifacts_task_id", req.artifacts_task_id), ("feature_group_version", req.feature_group_version)]
     )
     Task.enqueue(
         task=task,
