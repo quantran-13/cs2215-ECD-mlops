@@ -18,9 +18,9 @@ logger = get_logger("logs", __name__)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load task")
     parser.add_argument(
-        "--artifacts-task-id", type=str, help="Artifacts task ID", default="805c0653252a4e5594c916835abaccec"
+        "--artifacts_task_id", type=str, help="Artifacts task ID", default="805c0653252a4e5594c916835abaccec"
     )
-    parser.add_argument("--fg-ver", type=int, help="Feature group version", default=1)
+    parser.add_argument("--feature_group_version", type=str, help="Feature group version", default="1.0")
     args = parser.parse_args()
     print(f"Arguments: {args}")
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     task_artifacts = get_task_artifacts(task_id=task_id)
     data = task_artifacts["data"].get()
     metadata = task_artifacts["metadata"].get()
-    metadata["feature_group_version"] = args.fg_ver
+    metadata["feature_group_version"] = args.feature_group_version
 
     t1 = time.time()
     parent_datasets_id = metadata["feature_store_id"]

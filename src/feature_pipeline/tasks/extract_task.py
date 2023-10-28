@@ -19,15 +19,17 @@ logger = get_logger("logs", __name__)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract task")
     parser.add_argument(
-        "--artifacts-task-id", type=str, help="Artifacts task ID", default="3dfe30f7f8ca4619b535e43f64f66d05"
+        "--artifacts_task_id", type=str, help="Artifacts task ID", default="3dfe30f7f8ca4619b535e43f64f66d05"
     )
-    parser.add_argument("--fs-id", type=str, help="Feature store ID", default="fc0bbd2c1878466fa2d6e554ef3c8015")
-    parser.add_argument("--export-end-reference-datetime", type=str, help="Export end reference datetime")
-    parser.add_argument("--days-delay", type=int, help="Days delay", default=15)
-    parser.add_argument("--days-export", type=int, help="Days export", default=30)
+    parser.add_argument(
+        "--feature_store_id", type=str, help="Feature store ID", default="fc0bbd2c1878466fa2d6e554ef3c8015"
+    )
+    parser.add_argument("--export_end_reference_datetime", type=str, help="Export end reference datetime")
+    parser.add_argument("--days_delay", type=int, help="Days delay", default=15)
+    parser.add_argument("--days_export", type=int, help="Days export", default=30)
     args = parser.parse_args()
 
-    if args.export_end_reference_datetime is None:
+    if args.export_end_reference_datetime is None or args.export_end_reference_datetime == "":
         args.export_end_reference_datetime = "2023-04-01 00:00"
 
     print(f"Arguments: {args}")
@@ -61,7 +63,7 @@ if __name__ == "__main__":
             f"Could not extract the expected number of samples from the api: {metadata['num_unique_samples_per_time_series']} < {days_export * 24}. \
             Check out the API at: https://www.energidataservice.dk/tso-electricity/ConsumptionDE35Hour "
         )
-    metadata["feature_store_id"] = args.fs_id
+    metadata["feature_store_id"] = args.feature_store_id
     logger.info("Successfully extracted data in %.2f seconds.", time.time() - t1)
 
     task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])

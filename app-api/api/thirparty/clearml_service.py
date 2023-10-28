@@ -1,3 +1,5 @@
+from typing import Any
+
 from clearml import Model, Task, TaskTypes
 
 PROJECT_NAME: str = "cs2215-project"
@@ -63,20 +65,20 @@ class ClearMLService:
     def get_extract_task(
         project_name: str = PROJECT_NAME,
         task_name: str = "Extracting data",
-        task_type=TaskTypes.data_processing,
-        args: list[tuple[str,any]] = None, 
-        # tags="data-pipeline",
+        task_type: TaskTypes = TaskTypes.data_processing,
+        args: list[tuple[str, Any]] | None = None,
     ) -> Task:
-
         task = Task.create(
             project_name=project_name,
             task_name=task_name,
+            task_type="data_processing",
             repo=REPO,
             branch=BRANCH,
-            task_type=task_type,
             script="./src/feature_pipeline/tasks/extract_task.py",
             working_directory=".",
             argparse_args=args,
+            packages=True,
+            add_task_init_call=True,
         )
         return task
 
@@ -84,48 +86,19 @@ class ClearMLService:
     def get_transform_task(
         project_name: str = PROJECT_NAME,
         task_name="Transforming data",
-        task_type=TaskTypes.data_processing,
-        # tags="data-pipeline",
+        args: list[tuple[str, Any]] | None = None,
     ) -> Task:
-        args = {
-            # "artifacts_task_id": "OVERWRITE_ME",
-            "artifacts_task_id": "58764c6b9cac4049b5d897488d3302a1",
-        }
-
         task = Task.create(
             project_name=project_name,
             task_name=task_name,
+            task_type="data_processing",
             repo=REPO,
             branch=BRANCH,
             script="./src/feature_pipeline/tasks/transform_task.py",
-            task_type=task_type,
-            # tags=tags,
             working_directory=".",
-            # argparse_args=args,
-        )
-        return task
-
-    @staticmethod
-    def get_load_task(
-        project_name: str = PROJECT_NAME,
-        task_name="Loading data",
-        task_type=TaskTypes.data_processing,
-        # tags="data-pipeline",
-    ) -> Task:
-        args = {
-            # "artifacts_task_id": "OVERWRITE_ME",
-            "artifacts_task_id": "58764c6b9cac4049b5d897488d3302a1",
-        }
-        task = Task.create(
-            project_name=project_name,
-            task_name=task_name,
-            repo=REPO,
-            branch=BRANCH,
-            script="./src/feature_pipeline/tasks/load_task.py",
-            task_type=task_type,
-            # tags=tags,
-            working_directory=".",
-            # argparse_args=args,
+            argparse_args=args,
+            packages=True,
+            add_task_init_call=True,
         )
         return task
 
@@ -133,23 +106,99 @@ class ClearMLService:
     def get_validate_task(
         project_name: str = PROJECT_NAME,
         task_name="Validating data",
-        task_type=TaskTypes.data_processing,
-        # tags="data-pipeline",
+        args: list[tuple[str, Any]] | None = None,
     ) -> Task:
-        args = {
-            # "artifacts_task_id": "OVERWRITE_ME",
-            "artifacts_task_id": "384713a685d944e188769c73ccb5c6b2",
-        }
         task = Task.create(
             project_name=project_name,
             task_name=task_name,
+            task_type="data_processing",
             repo=REPO,
             branch=BRANCH,
             script="./src/feature_pipeline/tasks/validate_task.py",
-            task_type=task_type,
-            # tags=tags,
             working_directory=".",
-            # argparse_args=args,
+            argparse_args=args,
+            packages=True,
+            add_task_init_call=True,
+        )
+        return task
+
+    @staticmethod
+    def get_load_task(
+        project_name: str = PROJECT_NAME,
+        task_name="Loading data",
+        args: list[tuple[str, Any]] | None = None,
+    ) -> Task:
+        task = Task.create(
+            project_name=project_name,
+            task_name=task_name,
+            task_type="data_processing",
+            repo=REPO,
+            branch=BRANCH,
+            script="./src/feature_pipeline/tasks/load_task.py",
+            working_directory=".",
+            argparse_args=args,
+            packages=True,
+            add_task_init_call=True,
+        )
+        return task
+
+    @staticmethod
+    def get_hpo_task(
+        project_name: str = PROJECT_NAME,
+        task_name="Hyperparameter tuning",
+        args: list[tuple[str, Any]] | None = None,
+    ) -> Task:
+        task = Task.create(
+            project_name=project_name,
+            task_name=task_name,
+            task_type="training",
+            repo=REPO,
+            branch=BRANCH,
+            script="./src/training_pipeline/tasks/hyperparameter_tuning_task.py",
+            working_directory=".",
+            argparse_args=args,
+            packages=True,
+            add_task_init_call=True,
+        )
+        return task
+
+    @staticmethod
+    def get_train_task(
+        project_name: str = PROJECT_NAME,
+        task_name="Training",
+        args: list[tuple[str, Any]] | None = None,
+    ) -> Task:
+        task = Task.create(
+            project_name=project_name,
+            task_name=task_name,
+            task_type="training",
+            repo=REPO,
+            branch=BRANCH,
+            script="./src/training_pipeline/tasks/train_task.py",
+            working_directory=".",
+            argparse_args=args,
+            packages=True,
+            add_task_init_call=True,
+        )
+        return task
+
+    @staticmethod
+    def get_batch_prediction_task(
+        project_name: str = PROJECT_NAME,
+        task_name="Batch prediction",
+        args: list[tuple[str, Any]] | None = None,
+    ) -> Task:
+        task = Task.create(
+            project_name=project_name,
+            task_name=task_name,
+            task_type="inference",
+            repo=REPO,
+            branch=BRANCH,
+            script="./src/inference_pipeline/tasks/batch_prediction_task.py",
+            working_directory=".",
+            argparse_args=args,
+            packages=True,
+            add_task_init_call=True,
         )
         return task
 

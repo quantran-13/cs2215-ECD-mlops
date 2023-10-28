@@ -32,7 +32,7 @@ if __name__ == "__main__":
     task.connect(args)
     print(f"Arguments: {args}")
 
-    task.execute_remotely()
+    # task.execute_remotely()
 
     logger.info("Starting to create features ...")
 

@@ -1,6 +1,7 @@
 import sys
 import time
 from pathlib import Path
+import argparse
 
 from clearml import Task, TaskTypes
 
@@ -15,31 +16,28 @@ logger = get_logger("logs", __name__)
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Training task")
+    parser.add_argument("--data_task_id", type=str, help="Data task ID", default="8568e970ffd440ad9070de0f314f37b7")
+    parser.add_argument("--hpo_task_id", type=str, help="HPO task ID", default="a07d1f54a8654f37be8bff1847767e83")
+    parser.add_argument("--forecasting_horizon", type=int, help="Forecasting horizon", default=24)
+    args = parser.parse_args()
+    print(f"Arguments: {args}")
+
     task = Task.init(
         project_name=PROJECT_NAME,
         task_name="Training",
         task_type=TaskTypes.training,
         tags="training-pipeline",
     )
-
-    args = {
-        # "data_task_id": "OVERWRITE_ME",
-        # "hpo_task_id": "OVERWRITE_ME",
-        "forecasting_horizon": 24,
-        "data_task_id": "8568e970ffd440ad9070de0f314f37b7",
-        "hpo_task_id": "a07d1f54a8654f37be8bff1847767e83",
-    }
     task.connect(args)
-    print(f"Arguments: {args}")
-
     # task.execute_remotely()
 
     logger.info("Starting training task...")
     t1 = time.time()
     # Train model.
-    data_task_id = args["data_task_id"]
-    hpo_task_id = args["hpo_task_id"]
-    fh = args["forecasting_horizon"]
+    data_task_id = args.data_task_id
+    hpo_task_id = args.hpo_task_id
+    fh = args.forecasting_horizon
     train.run_from_best_config(task, data_task_id=data_task_id, hpo_task_id=hpo_task_id, fh=fh)
     logger.info("Successfully ran training task in %.2f seconds.", time.time() - t1)
 

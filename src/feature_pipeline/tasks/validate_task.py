@@ -18,7 +18,7 @@ logger = get_logger("logs", __name__)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Validate task")
     parser.add_argument(
-        "--artifacts-task-id", type=str, help="Artifacts task ID", default="7446859fb1be495496953cd28adc085b"
+        "--artifacts_task_id", type=str, help="Artifacts task ID", default="7446859fb1be495496953cd28adc085b"
     )
     args = parser.parse_args()
     print(f"Arguments: {args}")

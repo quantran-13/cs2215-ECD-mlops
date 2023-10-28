@@ -19,7 +19,7 @@ logger = get_logger("logs", __name__)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Transform task")
     parser.add_argument(
-        "--artifacts-task-id", type=str, help="Artifacts task ID", default="68629139079948d197e1eebb8249c130"
+        "--artifacts_task_id", type=str, help="Artifacts task ID", default="68629139079948d197e1eebb8249c130"
     )
     args = parser.parse_args()
     print(f"Arguments: {args}")
