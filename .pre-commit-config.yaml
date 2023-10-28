@@ -1,0 +1,81 @@
+ci:
+  autofix_prs: true
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit suggestions"
+  autoupdate_schedule: monthly
+  # submodules: true
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # - id: check-added-large-files
+      #   args: [--maxkb=100]
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-docstring-first
+      # - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      # - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: name-tests-test
+      - id: trailing-whitespace
+      - id: check-case-conflict
+      - id: check-merge-conflict
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        args: [--line-length=120]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black", "--filter-files"]
+  # - repo: https://github.com/PyCQA/docformatter
+  #   rev: v1.7.5
+  #   hooks:
+  #     - id: docformatter
+  # - repo: https://github.com/PyCQA/flake8
+  #   rev: 6.1.0
+  #   hooks:
+  #     - id: flake8
+  #       name: flake9
+  #       types: [python]
+  #       args:
+  #         - --max-line-length=120
+  #         - --ignore=E203
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.6.0
+  #   hooks:
+  #     - id: mypy
+  #       args: [--ignore-missing-imports]
+  - repo: https://github.com/hadialqattan/pycln
+    rev: "v2.1.5"
+    hooks:
+      - id: pycln
+        args: [".", "--all"]
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.0
+    hooks:
+      - id: pyupgrade
+        args: [--py310-plus]
+  # - repo: https://github.com/codespell-project/codespell
+  #   rev: v2.2.6
+  #   hooks:
+  #     - id: codespell
+  #       args:
+  #         - --ignore-words-list=crate,nd,strack,dota,ane,segway,fo,gool,winn
+  # - repo: https://github.com/asottile/dead
+  #   rev: v1.5.2
+  #   hooks:
+  #     - id: dead
+# -   repo: local
+#     hooks:
+#     -   id: unittest
+#         name: run unit tests
+#         language: system
+#         pass_filenames: false
+#         entry: poetry run coverage run -m pytest

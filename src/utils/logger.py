@@ -3,11 +3,7 @@ import sys
 from pathlib import Path
 
 
-def get_logger(
-    logdir: Path | str,
-    name: str = "app",
-    log_level: int = logging.INFO,
-) -> logging.Logger:
+def get_logger(logdir: Path | str, name: str = "app", log_level: int = logging.INFO) -> logging.Logger:
     """Setup a logger with file and stream handlers.
 
     Args:
@@ -21,7 +17,6 @@ def get_logger(
     Returns:
         logging.Logger: logger object
     """
-
     logdir = Path(logdir)
     logdir.mkdir(parents=True, exist_ok=True)
     path = logdir / name
@@ -29,16 +24,10 @@ def get_logger(
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
 
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)s %(filename)s %(funcName)s(%(lineno)d) %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(filename)s %(funcName)s(%(lineno)d): %(message)s")
 
     stream_handler = logging.StreamHandler(sys.stdout)
-    file_handler = logging.FileHandler(
-        filename=path.with_suffix(".log"),
-        mode="a",
-        encoding="utf-8",
-    )
+    file_handler = logging.FileHandler(filename=path.with_suffix(".log"), mode="a", encoding="utf-8")
 
     file_handler.setLevel(log_level)
     stream_handler.setLevel(log_level)
