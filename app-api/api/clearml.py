@@ -12,11 +12,36 @@ def hello_world() -> dict:
 
 
 @clearml_router.get("/v1/status", status_code=200)
-def get_task_status(task_id: str, project_name: str | None = "cs2215-project") -> dict:
-    task = Task.get_task(task_id=task_id, project_name=project_name)
-    task_status = task.get_status()
-    return {"task_id": task.id, "task_status": task_status}
+def get_task_status(
+    task_id: str, 
+    project_name: str | None = "cs2215-project", 
+) -> dict:
+    task = Task.get_task(
+        task_id=task_id, 
+        project_name=project_name
+    )
+    status = task.get_status()
+    return { 
+        "task_id": task.id, 
+        "status": status
+    } 
 
+@clearml_router.get("/v1/get_metadata", status_code=200)
+def get_task_status(
+    task_id: str, 
+    project_name: str | None = "cs2215-project", 
+) -> dict:
+    task = Task.get_task(
+        task_id=task_id, 
+        project_name=project_name
+    )
+    status = task.get_status()
+    metadata = task.artifacts['metadata'].get('url')
+    return { 
+        "task_id": task.id, 
+        "status": status, 
+        "metadata": metadata, 
+    } 
 
 @clearml_router.post("/v1/feature_pipeline/extract", status_code=200)
 def run_extract_data(req: idm.IExtractDataRequest) -> dict:
