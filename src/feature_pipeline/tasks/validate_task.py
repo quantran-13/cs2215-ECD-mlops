@@ -27,8 +27,8 @@ if __name__ == "__main__":
         project_name=PROJECT_NAME,
         task_name="Validating data",
         task_type=TaskTypes.data_processing,
-        tags="data-pipeline",
     )
+    task.add_tags(["feature-pipeline", "validate"])
     task.connect(args)
     # task.execute_remotely()
 

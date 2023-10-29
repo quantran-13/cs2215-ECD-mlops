@@ -28,8 +28,8 @@ if __name__ == "__main__":
         project_name=PROJECT_NAME,
         task_name="Loading data",
         task_type=TaskTypes.data_processing,
-        tags="data-pipeline",
     )
+    task.add_tags(["feature-pipeline", "load"])
     task.connect(args)
 
     logger.info("Loading data to the feature store.")

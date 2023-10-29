@@ -1,8 +1,8 @@
+import argparse
 import ast
 import sys
 import time
 from pathlib import Path
-import argparse
 
 from clearml import Task, TaskTypes
 
@@ -43,8 +43,8 @@ if __name__ == "__main__":
         project_name=PROJECT_NAME,
         task_name="Hyperparameter Tuning",
         task_type=TaskTypes.training,
-        tags="training-pipeline",
     )
+    task.add_tags(["training-pipeline", "hyperparameter-tuning"])
     task.connect(args)
     # task.execute_remotely()
 

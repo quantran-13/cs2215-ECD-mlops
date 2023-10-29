@@ -10,21 +10,14 @@ clearml_router = APIRouter()
 def hello_world() -> dict:
     return {"data": "Hello World"}
 
+
 @clearml_router.get("/v1/status", status_code=200)
-def get_task_status(
-    task_id: str, 
-    project_name: str | None = "cs2215-project", 
-) -> dict:
-    task = Task.get_task(
-        task_id=task_id, 
-        project_name=project_name
-    )
-    status = task.get_status()
-    return { 
-        "task_id": task.id, 
-        "status": status
-    } 
- 
+def get_task_status(task_id: str, project_name: str | None = "cs2215-project") -> dict:
+    task = Task.get_task(task_id=task_id, project_name=project_name)
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
+
+
 @clearml_router.post("/v1/feature_pipeline/extract", status_code=200)
 def run_extract_data(req: idm.IExtractDataRequest) -> dict:
     task = ClearMLService.get_extract_task(
@@ -40,7 +33,8 @@ def run_extract_data(req: idm.IExtractDataRequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id, "status": task.get_status()}
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
 
 
 @clearml_router.post("/v1/feature_pipeline/transform", status_code=200)
@@ -54,7 +48,8 @@ def run_transform_data(req: idm.ITransformDataRequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id}
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
 
 
 @clearml_router.post("/v1/feature_pipeline/validate", status_code=200)
@@ -68,7 +63,8 @@ def run_validate_data(req: idm.IValidateDataRequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id}
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
 
 
 @clearml_router.post("/v1/feature_pipeline/load", status_code=200)
@@ -80,7 +76,8 @@ def run_load_data(req: idm.ILoadDataRequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id}
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
 
 
 @clearml_router.post("/v1/training_pipeline/hpo", status_code=200)
@@ -98,7 +95,8 @@ def run_hpo(req: idm.IHPORequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id}
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
 
 
 @clearml_router.post("/v1/training_pipeline/train", status_code=200)
@@ -114,7 +112,8 @@ def run_train(req: idm.ITrainRequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id}
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
 
 
 @clearml_router.post("/v1/batch_prediction_pipeline/batch_prediction", status_code=200)
@@ -130,4 +129,5 @@ def run_batch_prediction(req: idm.IBatchPredictionRequest) -> dict:
         task=task,
         queue_name="default",
     )
-    return {"task_id": task.id}
+    task_status = task.get_status()
+    return {"task_id": task.id, "task_status": task_status}
