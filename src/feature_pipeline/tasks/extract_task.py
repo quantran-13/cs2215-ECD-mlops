@@ -28,10 +28,6 @@ if __name__ == "__main__":
     parser.add_argument("--days_delay", type=int, help="Days delay", default=15)
     parser.add_argument("--days_export", type=int, help="Days export", default=30)
     args = parser.parse_args()
-
-    if args.export_end_reference_datetime is None or args.export_end_reference_datetime == "":
-        args.export_end_reference_datetime = "2023-04-01 00:00"
-
     print(f"Arguments: {args}")
 
     task = Task.init(
@@ -48,8 +44,11 @@ if __name__ == "__main__":
     task_artifacts = get_task_artifacts(task_id=args.artifacts_task_id)
     data = task_artifacts["data"].get()
 
+    # if args.export_end_reference_datetime is None or args.export_end_reference_datetime == "":
+    #     args.export_end_reference_datetime = "2023-04-01 00:00"
+
     export_end_reference_datetime = args.export_end_reference_datetime
-    if export_end_reference_datetime == "":
+    if export_end_reference_datetime is None or export_end_reference_datetime == "":
         export_end_reference_datetime = None
     else:
         export_end_reference_datetime = dt.datetime.strptime(export_end_reference_datetime, "%Y-%m-%d %H:%M")

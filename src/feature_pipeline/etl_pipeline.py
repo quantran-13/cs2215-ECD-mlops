@@ -28,7 +28,7 @@ if __name__ == "__main__":
     pipe.add_parameter("run_datetime", "2023-06-30 21:00", "The value must be in the format: YYYY-MM-DD HH:MM")
     pipe.add_parameter("days_delay", 15)
     pipe.add_parameter("days_export", 30)
-    pipe.add_parameter("feature_group_version", 1)
+    pipe.add_parameter("feature_group_version", "1.0")
 
     pipe.add_step(
         name="extract_data",
