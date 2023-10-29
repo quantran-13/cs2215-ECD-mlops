@@ -196,7 +196,7 @@ class ClearMLService:
             task_type="inference",
             repo=REPO,
             branch=BRANCH,
-            script="./src/inference_pipeline/tasks/batch_prediction_task.py",
+            script="./src/batch_prediction_pipeline/tasks/batch_prediction_task.py",
             working_directory=".",
             argparse_args=args,
             packages=True,
