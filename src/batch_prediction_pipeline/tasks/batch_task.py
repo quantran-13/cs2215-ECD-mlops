@@ -40,7 +40,7 @@ if __name__ == "__main__":
     data_task_id = args.data_task_id
     training_task_id = args.training_task_id
     fh = args.forecasting_horizon
-    batch.predict(task, data_task_id=data_task_id, training_task_id=training_task_id, fh=fh)
+    batch.predict(task=task, data_task_id=data_task_id, training_task_id=training_task_id, fh=fh)
     logger.info("Successfully ran batch prediction task in %.2f seconds.", time.time() - t1)
 
     logger.info("=" * 80)

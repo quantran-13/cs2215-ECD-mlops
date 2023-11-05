@@ -1,30 +1,34 @@
 import warnings
 
-warnings.filterwarnings("ignore", category=FutureWarning)
-warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings(action="ignore", category=FutureWarning)
+warnings.filterwarnings(action="ignore", category=DeprecationWarning)
 
 import time
 
 import pandas as pd
 from clearml import Dataset
 from configs.configs import DATASET_NAME, PROJECT_NAME
-from root import PROCESSED_DIR
+from root import FEATURE_REPO_DIR
 from src.batch_prediction_pipeline.src.data import load_data
 from src.utils.logger import get_logger
 from src.utils.task_utils import get_task_artifacts, save_json
 
-logger = get_logger("logs", __name__)
+logger = get_logger(logdir="logs", name=__name__)
 
 
 def predict(task, data_task_id: str, training_task_id: str, fh: int = 24):
-    """Main function used to do batch predictions.
+    """Batch prediction for inference time.
 
     Args:
         fh (int, optional): forecast horizon. Defaults to 24.
-        feature_view_version (Optional[int], optional): feature store feature view version. If None is provided, it will try to load it from the cached feature_view_metadata.json file.
-        model_version (Optional[int], optional): model version to load from the model registry. If None is provided, it will try to load it from the cached train_metadata.json file.
-        start_datetime (Optional[datetime], optional): start datetime used for extracting features for predictions. If None is provided, it will try to load it from the cached feature_pipeline_metadata.json file.
-        end_datetime (Optional[datetime], optional): end datetime used for extracting features for predictions. If None is provided, it will try to load it from the cached feature_pipeline_metadata.json file.
+        feature_view_version (Optional[int], optional): feature store feature view version. If None is provided, it \
+            will try to load it from the cached feature_view_metadata.json file.
+        model_version (Optional[int], optional): model version to load from the model registry. If None is provided, \
+            it will try to load it from the cached train_metadata.json file.
+        start_datetime (Optional[datetime], optional): start datetime used for extracting features for predictions. \
+            If None is provided, it will try to load it from the cached feature_pipeline_metadata.json file.
+        end_datetime (Optional[datetime], optional): end datetime used for extracting features for predictions. If \
+            None is provided, it will try to load it from the cached feature_pipeline_metadata.json file.
     """
     logger.info("Loading data from feature store...")
     t1 = time.time()
@@ -38,7 +42,7 @@ def predict(task, data_task_id: str, training_task_id: str, fh: int = 24):
 
     logger.info("Making predictions...")
     t1 = time.time()
-    predictions = forecast(model, X, fh=fh)
+    predictions = forecast(model=model, X=X, fh=fh)
     metadata["predictions_datetime_utc_start"] = (
         predictions.index.get_level_values(level="datetime_utc").min().strftime(metadata["datetime_format"])
     )
@@ -54,7 +58,7 @@ def predict(task, data_task_id: str, training_task_id: str, fh: int = 24):
 
     logger.info("Saving predictions...")
     t1 = time.time()
-    ds = save(task, X, y, predictions, metadata)
+    ds = save(task=task, X=X, y=y, predictions=predictions, metadata=metadata)
     metadata["predictions_dataset_id"] = ds.id
     task.upload_artifact("metadata", metadata)
     task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])
@@ -119,8 +123,8 @@ def save(task, X: pd.DataFrame, y: pd.DataFrame, predictions: pd.DataFrame, meta
     task.upload_artifact("y", y)
     task.upload_artifact("predictions", predictions)
 
-    predictions.to_csv(PROCESSED_DIR / "predictions.csv", index_label=["area", "consumer_type", "datetime_utc"])
-    save_json(metadata, PROCESSED_DIR / "batch_metadata.json")
+    predictions.to_csv(FEATURE_REPO_DIR / "predictions.csv", index_label=["area", "consumer_type", "datetime_utc"])
+    save_json(metadata, FEATURE_REPO_DIR / "batch_metadata.json")
 
     ds = Dataset.create(
         dataset_name=DATASET_NAME,
@@ -135,8 +139,8 @@ def save(task, X: pd.DataFrame, y: pd.DataFrame, predictions: pd.DataFrame, meta
         ],
     )
 
-    ds.add_files(path=PROCESSED_DIR / "predictions.csv", verbose=True)
-    ds.add_files(path=PROCESSED_DIR / "batch_metadata.json", verbose=True)
+    ds.add_files(path=FEATURE_REPO_DIR / "predictions.csv", verbose=True)
+    ds.add_files(path=FEATURE_REPO_DIR / "batch_metadata.json", verbose=True)
 
     ds.upload(verbose=True)
     ds.finalize()

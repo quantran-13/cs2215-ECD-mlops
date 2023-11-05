@@ -13,13 +13,11 @@ from src.feature_pipeline.src import load
 from src.utils.logger import get_logger
 from src.utils.task_utils import get_task_artifacts
 
-logger = get_logger("logs", __name__)
+logger = get_logger(logdir="logs", name=__name__)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load task")
-    parser.add_argument(
-        "--artifacts_task_id", type=str, help="Artifacts task ID", default="805c0653252a4e5594c916835abaccec"
-    )
+    parser.add_argument("--artifacts_task_id", type=str, help="Artifacts task ID", required=True)
     parser.add_argument("--feature_group_version", type=str, help="Feature group version", default="1.0")
     args = parser.parse_args()
     print(f"Arguments: {args}")
@@ -41,7 +39,7 @@ if __name__ == "__main__":
 
     t1 = time.time()
     parent_datasets_id = metadata["feature_store_id"]
-    ds, metadata = load.to_feature_store(data, metadata, parent_datasets_id=parent_datasets_id)
+    ds, metadata = load.to_feature_store(data=data, metadata=metadata, parent_datasets_id=parent_datasets_id)
     logger.info("Successfully loaded data to the feature store in %.2f seconds.", time.time() - t1)
 
     task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])

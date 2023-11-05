@@ -1,4 +1,3 @@
-import csv
 import sys
 import time
 from pathlib import Path
@@ -6,29 +5,26 @@ from pathlib import Path
 import pandas as pd
 from clearml import Dataset, Task, TaskTypes
 
-CURRENT_DIR = Path(__file__).parent.parent.parent.parent
-sys.path.insert(0, str(CURRENT_DIR))
+CURRENT_DIR: Path = Path(__file__).parent.parent.parent.parent
+sys.path.insert(0, str(object=CURRENT_DIR))
 
 from configs.configs import DATASET_NAME, PROJECT_NAME
-from root import DATA_DIR, RAW_DIR
+from root import DATA_DIR, FEATURE_REPO_DIR
 from src.utils.logger import get_logger
 
-logger = get_logger("logs", __name__)
-
-
-def convert_txt_to_csv(input_filepath, output_filepath):
-    with open(input_filepath) as input_file:
-        with open(output_filepath, "w", newline="") as output_file:
-            reader = csv.reader(input_file, delimiter=";")
-            writer = csv.writer(output_file)
-            writer.writerows(reader)
+logger = get_logger(logdir="logs", name=__name__)
 
 
 if __name__ == "__main__":
     # Example usage:
-    in_filepath = DATA_DIR / "backup" / "ConsumptionDE35Hour.csv"
-    out_filepath = RAW_DIR / "ConsumptionDE35Hour.csv"
-    convert_txt_to_csv(in_filepath, out_filepath)
+    in_filepath: Path = DATA_DIR / "backup" / "ConsumptionDE35Hour.csv"
+    df: pd.DataFrame = pd.read_csv(filepath_or_buffer=in_filepath, sep=";")
+    out_filepath: Path = FEATURE_REPO_DIR / "ConsumptionDE35Hour.parquet"
+    df.to_parquet(path=out_filepath, index=False)
+    out_filepath: Path = FEATURE_REPO_DIR / "ConsumptionDE35Hour.csv"
+    df.to_csv(path_or_buf=out_filepath, index=False)
+
+    # data = pd.read_parquet(path=out_filepath)
 
     task = Task.init(
         project_name=PROJECT_NAME,

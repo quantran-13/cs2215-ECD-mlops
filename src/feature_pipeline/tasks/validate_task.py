@@ -5,7 +5,7 @@ from pathlib import Path
 
 from clearml import Task, TaskTypes
 
-CURRENT_DIR = Path(__file__).parent.parent.parent.parent
+CURRENT_DIR: Path = Path(__file__).parent.parent.parent.parent
 sys.path.append(str(CURRENT_DIR))
 
 from configs.configs import PROJECT_NAME
@@ -13,13 +13,11 @@ from src.feature_pipeline.src import validate
 from src.utils.logger import get_logger
 from src.utils.task_utils import get_task_artifacts
 
-logger = get_logger("logs", __name__)
+logger = get_logger(logdir="logs", name=__name__)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Validate task")
-    parser.add_argument(
-        "--artifacts_task_id", type=str, help="Artifacts task ID", default="7446859fb1be495496953cd28adc085b"
-    )
+    parser.add_argument("--artifacts_task_id", type=str, help="Artifacts task ID", required=True)
     args = parser.parse_args()
     print(f"Arguments: {args}")
 
@@ -37,10 +35,10 @@ if __name__ == "__main__":
     data = task_artifacts["data"].get()
     metadata = task_artifacts["metadata"].get()
 
-    t1 = time.time()
-    validation_expectation_suite = validate.build_expectation_suite(data)
+    t1: float = time.time()
+    validation_expectation_suite = validate.build_expectation_suite(df=data)
     logger.info("Successfully built validation expectation suite in %.2f seconds.", time.time() - t1)
-    result = validate.validate(data, validation_expectation_suite)
+    result = validate.validate(data, expectation_suite=validation_expectation_suite)
     logger.info("Successfully validated data in %.2f seconds.", time.time() - t1)
 
     task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])

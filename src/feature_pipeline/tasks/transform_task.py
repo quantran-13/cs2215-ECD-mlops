@@ -13,14 +13,12 @@ from src.feature_pipeline.src import transform
 from src.utils.logger import get_logger
 from src.utils.task_utils import get_task_artifacts
 
-logger = get_logger("logs", __name__)
+logger = get_logger(logdir="logs", name=__name__)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Transform task")
-    parser.add_argument(
-        "--artifacts_task_id", type=str, help="Artifacts task ID", default="68629139079948d197e1eebb8249c130"
-    )
+    parser.add_argument("--artifacts_task_id", type=str, help="Artifacts task ID", required=True)
     args = parser.parse_args()
     print(f"Arguments: {args}")
 
@@ -39,7 +37,7 @@ if __name__ == "__main__":
     metadata = task_artifacts["metadata"].get()
 
     t1 = time.time()
-    data = transform.transform(data)
+    data = transform.transform(data=data)
     logger.info("Successfully transformed data in %.2f seconds.", time.time() - t1)
 
     task.add_tags([metadata["export_datetime_utc_start"], metadata["export_datetime_utc_end"]])

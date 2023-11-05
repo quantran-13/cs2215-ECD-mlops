@@ -14,16 +14,14 @@ from src.feature_pipeline.src import extract
 from src.utils.logger import get_logger
 from src.utils.task_utils import get_task_artifacts
 
-logger = get_logger("logs", __name__)
+logger = get_logger(logdir="logs", name=__name__)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract task")
     parser.add_argument(
         "--artifacts_task_id", type=str, help="Artifacts task ID", default="3dfe30f7f8ca4619b535e43f64f66d05"
     )
-    parser.add_argument(
-        "--feature_store_id", type=str, help="Feature store ID", default="fc0bbd2c1878466fa2d6e554ef3c8015"
-    )
+    parser.add_argument("--feature_store_id", type=str, help="Feature store ID", required=True)
     parser.add_argument("--export_end_reference_datetime", type=str, help="Export end reference datetime")
     parser.add_argument("--days_delay", type=int, help="Days delay", default=15)
     parser.add_argument("--days_export", type=int, help="Days export", default=30)
@@ -56,12 +54,17 @@ if __name__ == "__main__":
     days_delay = args.days_delay
     days_export = args.days_export
 
-    t1 = time.time()
-    data, metadata = extract.from_file(data, export_end_reference_datetime, days_delay, days_export)
+    t1: float = time.time()
+    data, metadata = extract.from_file(
+        data=data,
+        export_end_reference_datetime=export_end_reference_datetime,
+        days_delay=days_delay,
+        days_export=days_export,
+    )
     if metadata["num_unique_samples_per_time_series"] < days_export * 24:
         raise RuntimeError(
             f"Could not extract the expected number of samples from the api: {metadata['num_unique_samples_per_time_series']} < {days_export * 24}. \
-            Check out the API at: https://www.energidataservice.dk/tso-electricity/ConsumptionDE35Hour "
+            Check out the API at: https://www.energidataservice.dk/tso-electricity/ConsumptionDE35Hour "  # noqa: E501
         )
     metadata["feature_store_id"] = args.feature_store_id
     logger.info("Successfully extracted data in %.2f seconds.", time.time() - t1)
