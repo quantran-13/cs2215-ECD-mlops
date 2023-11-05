@@ -39,7 +39,8 @@ if __name__ == "__main__":
     # task.execute_remotely()
 
     logger.info("Extracting data from API.")
-    task_artifacts = get_task_artifacts(task_id=args.artifacts_task_id)
+    artifacts_task_id = args.artifacts_task_id
+    task_artifacts = get_task_artifacts(task_id=artifacts_task_id)
     data = task_artifacts["data"].get()
 
     # if args.export_end_reference_datetime is None or args.export_end_reference_datetime == "":

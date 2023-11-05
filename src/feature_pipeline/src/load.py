@@ -25,7 +25,9 @@ def to_feature_store(data: pd.DataFrame, metadata: dict, parent_datasets_id: str
     if "processed.csv" in parent_dataset.list_files():
         df = pd.read_csv(filepath_or_buffer=f"{local_path}/processed.csv")
         df.drop(columns=["index"], inplace=True)
+
         df["datetime_utc"] = pd.to_datetime(arg=df["datetime_utc"])
+        data["datetime_utc"] = pd.to_datetime(arg=df["datetime_utc"])
 
         data_ = pd.concat(objs=[df, data], ignore_index=True)
         data_.sort_values(by="datetime_utc", inplace=True, ascending=False)
